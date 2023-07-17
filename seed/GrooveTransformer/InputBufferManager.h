@@ -75,18 +75,6 @@ struct InputBufferManager {
         }
     }
 
-// ******* FOR TESTING **************
-    void PrintInputBuffer() { // for testing
-        for (auto&& onset : buffer) {
-            if (onset) {
-                // hw.PrintLine("Onset exists at step %d, with an offset of %d ticks", onset->step, onset->step_offset_ticks);
-            } else if (!onset) {
-                // hw.PrintLine("No onset at this step");
-            }
-        }
-    }
-    // ******* FOR TESTING **************
-
     Onset * GetOnset(int step_index) {
         auto ptr = this->buffer[step_index].get();
         return ptr;
@@ -109,7 +97,6 @@ struct InputBufferManager {
                 float velocity = 0.;
                 Onset onset = AddOnset(current_step_index_and_offset_ticks.first, velocity, current_step_index_and_offset_ticks.second);
                 this->uart_libre_manager->TransmitOnset(onset);
-                hardware_manager->hw->PrintLine("Transmitted DELETE ONSET");
             }
         }
     }

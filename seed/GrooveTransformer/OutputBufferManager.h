@@ -100,27 +100,27 @@ struct OutputBufferManager {
         this->ClearAllVoices(OutputBuffer::OUTPUT_BUFFER_2);
     };
 
-    void PrintOutputBuffer(int buff_idx) { // for testing
-        OutputBufferVoice op1 = *output_buffer_one[buff_idx];
-        OutputBufferVoice op2 = *output_buffer_two[buff_idx];
+    // void PrintOutputBuffer(int buff_idx) { // for testing
+    //     OutputBufferVoice op1 = *output_buffer_one[buff_idx];
+    //     OutputBufferVoice op2 = *output_buffer_two[buff_idx];
 
-        int idx = 0;
-        hardware_manager->hw->PrintLine("PRINTING OUTPUT BUFFER 1");
-        for (float velocity_value : op1.GetBuffer()) {
-            int velocity_value_int = int(velocity_value);
-            hardware_manager->hw->PrintLine("Tick %d: %d", idx, velocity_value_int);
-            idx++;
-        }
-        hardware_manager->hw->PrintLine("PRINTING OUTPUT BUFFER 1 END");
-        int idx2 = 0;
-        hardware_manager->hw->PrintLine("PRINTING OUTPUT BUFFER 2");
-        for (float velocity_value2 : op2.GetBuffer()) {
-            int velocity_value_int2 = int(velocity_value2);
-            hardware_manager->hw->PrintLine("Tick %d: %d", idx2, velocity_value_int2);
-            idx2++;
-        }
-        hardware_manager->hw->PrintLine("PRINTING OUTPUT BUFFER 2 END");
-    }
+    //     int idx = 0;
+    //     hardware_manager->hw->PrintLine("PRINTING OUTPUT BUFFER 1");
+    //     for (float velocity_value : op1.GetBuffer()) {
+    //         int velocity_value_int = int(velocity_value);
+    //         hardware_manager->hw->PrintLine("Tick %d: %d", idx, velocity_value_int);
+    //         idx++;
+    //     }
+    //     hardware_manager->hw->PrintLine("PRINTING OUTPUT BUFFER 1 END");
+    //     int idx2 = 0;
+    //     hardware_manager->hw->PrintLine("PRINTING OUTPUT BUFFER 2");
+    //     for (float velocity_value2 : op2.GetBuffer()) {
+    //         int velocity_value_int2 = int(velocity_value2);
+    //         hardware_manager->hw->PrintLine("Tick %d: %d", idx2, velocity_value_int2);
+    //         idx2++;
+    //     }
+    //     hardware_manager->hw->PrintLine("PRINTING OUTPUT BUFFER 2 END");
+    // }
 
     OutputBufferVoice * GetOutputBufferVoice(int voice_index) {
         auto ptr = this->output_buffer_one[voice_index].get();

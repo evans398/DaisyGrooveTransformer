@@ -77,7 +77,7 @@ struct UartLibreManager {
         if (top_fifo_item != 0x0a) { // if top is not \n char, add it to the char string
             fifo_char_string += char(top_fifo_item);
         } else {
-            hardware_manager->hw->PrintLine("Received: %s", fifo_char_string.c_str());
+            // hardware_manager->hw->PrintLine("Received: %s", fifo_char_string.c_str());
             if (fifo_char_string.size() > 20) {
                 fifo_char_string.clear();
             }

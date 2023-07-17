@@ -57,7 +57,6 @@ struct UartMidiManager {
                         if (this->input_buffer_manager->CreateAndAddOnsetToInputBuffer(current_step_index_and_offset_ticks.first, input_velocity, current_step_index_and_offset_ticks.second)) {
                             Onset onset = this->input_buffer_manager->AddOnset(current_step_index_and_offset_ticks.first, input_velocity, current_step_index_and_offset_ticks.second);
                             this->uart_libre_manager->TransmitOnset(onset);
-                            hardware_manager->hw->PrintLine("Transmitted NEW Onset");
                         }
                         is_onset = false; // reset is_onset to false after we process an onset here. it goes back to true once the midi note ends
                     }
