@@ -548,18 +548,21 @@ struct TempoPot {
     int mux_idx;
     ClockManager* clock_manager;
     HardwareManager* hardware_manager;
+    HardwareClock* hardware_clock;
     int prev_value;
 
     TempoPot(
         int mux_channel,
         int mux_idx,
         ClockManager* clock_manager, 
-        HardwareManager* hardware_manager
+        HardwareManager* hardware_manager,
+        HardwareClock* hardware_clock
     ){
         this->mux_channel=mux_channel;
         this->mux_idx=mux_idx;
         this->clock_manager=clock_manager;
         this->hardware_manager=hardware_manager;
+        this->hardware_clock=hardware_clock;
         ReadAndSetTempo();
     }
 
@@ -586,7 +589,7 @@ struct TempoPot {
             clock_freq_hz = bpm * (1.0f/60.f) * ppqn;
             // hardware_manager->hw->PrintLine("BPM: " FLT_FMT3, FLT_VAR3(bpm));
             this->clock_manager->metro->SetFreq(clock_freq_hz);
-            this->clock_manager->UpdatePeriod(bpm);
+            this->hardware_clock->UpdatePeriod(bpm);
         }
         prev_value = scaled_value;
     }

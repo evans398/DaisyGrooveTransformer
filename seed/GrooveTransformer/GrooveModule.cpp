@@ -1,9 +1,9 @@
 #include "GrooveModule.h"
 using namespace daisy;
 
-TimerHandle         internal_clock;
+TimerHandle         hardware_timer;
 TimerHandle::Config internal_clock_cfg;
-const float         internal_clock_freq = 200000000; // can be confirmed with internal_clock.GetFreq()
+const float         internal_clock_freq = 200000000; // can be confirmed with hardware_clock.GetFreq()
 bool led_on = true;
 
 MidiUartHandler uart_midi;
@@ -16,11 +16,11 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
 {
 	for(size_t i = 0; i < size; i++)
     {
-        if (clock_manager->metro->Process() && clock_manager->play_enabled) {
-            // clock_manager->ClockOut();
-            playback_manager->TriggerOutputs();
-            clock_manager->AdvanceClockIndex();
-        }
+        // if (clock_manager->metro->Process() && clock_manager->play_enabled) {
+        //     // clock_manager->ClockOut();
+        //     playback_manager->TriggerOutputs();
+        //     clock_manager->AdvanceClockIndex();
+        // }
         ui_components_manager->PlayReadAndSetState();
         clock_manager->ObservePlayState();
     }
@@ -28,20 +28,20 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
 
 // void UpdatePeriod(float bpm){
 //     // float period = static_cast<uint32_t>(internal_clock_freq_hz/clock_freq_hz);
-//     // this->internal_clock->SetPeriod(period);
+//     // this->hardware_clock->SetPeriod(period);
 //     float bps                       = bpm / 60.0f; // convert to beats per second
 //     const float ppqn                = 8; // init pulses
 //     float clock_freq_hz             = ppqn * bpm * (1.0f/60.f); // clock frequency at ppqn resolution (1/60) is hz/bpm (so 120bpm is 2hz). One is a q note so we multiply by ppqn
-//     const float internal_clock_freq_hz = 200000000; // can be confirmed with internal_clock.GetFreq()
+//     const float internal_clock_freq_hz = 200000000; // can be confirmed with hardware_clock.GetFreq()
 //     float period                  = internal_clock_freq_hz/clock_freq_hz;
-//     internal_clock.SetPeriod(static_cast<uint32_t>(period));
+//     hardware_clock.SetPeriod(static_cast<uint32_t>(period));
 // }
 
 void sendClockPulse(){
     // TODO make sure the rate that it sends clock is correct. currently it's divided 2 clock
     // TODO ties this with main clock start/stop
-        hardware_manager->clock_out.Write(led_on);
-        led_on = !led_on;
+    hardware_manager->clock_out.Write(led_on);
+    led_on = !led_on;
     // if (clock_manager->play_enabled) {
     // }
 }
@@ -76,17 +76,30 @@ int main(void)
     // hardware_manager->hw->PrintLine("DAISY ONLINE");
 
     // ** Init Managers */
-    clock_manager = std::make_unique<ClockManager> (&metro, &internal_clock, hardware_manager.get());
+    clock_manager = std::make_unique<ClockManager> (&metro, hardware_manager.get());
     // hardware_clock = std::make_unique<HardwareClock> (hardware_manager.get());
     output_buffer_manager = std::make_unique<OutputBufferManager> (hardware_manager.get());
     uart_libre_manager = std::make_unique<UartLibreManager> (&uart_libre, output_buffer_manager.get(), hardware_manager.get());
     input_buffer_manager = std::make_unique<InputBufferManager> (uart_libre_manager.get(), clock_manager.get(), hardware_manager.get());
+    
+    // ** Set up hardware_clock for external syncing */
+    internal_clock_cfg.periph     = TimerHandle::Config::Peripheral::TIM_5;
+    internal_clock_cfg.dir     = TimerHandle::Config::CounterDir::UP;
+    internal_clock_cfg.enable_irq = true;
+    float period                  = internal_clock_freq_hz/clock_freq_hz;
+    internal_clock_cfg.period     = static_cast<uint32_t>(period);
+    hardware_timer.Init(internal_clock_cfg);
+    hardware_timer.SetCallback(ClockTimerCallback);
+    hardware_timer.Start();
+    hardware_clock = std::make_unique<HardwareClock> (&hardware_timer, hardware_manager.get());
+    
     ui_components_manager = std::make_unique<UIComponentsManager> (
         hardware_manager.get(),
         uart_libre_manager.get(), 
         input_buffer_manager.get(),
         output_buffer_manager.get(),
-        clock_manager.get()
+        clock_manager.get(),
+        hardware_clock.get()
     );
 
     uart_midi_manager = std::make_unique<UartMidiManager> (
@@ -104,15 +117,6 @@ int main(void)
         output_buffer_manager.get(), 
         hardware_manager.get()
     );
-
-    // ** Set up internal_clock for external syncing */
-    internal_clock_cfg.periph     = TimerHandle::Config::Peripheral::TIM_5;
-    internal_clock_cfg.enable_irq = true;
-    float period                  = internal_clock_freq_hz/clock_freq_hz;
-    internal_clock_cfg.period     = static_cast<uint32_t>(period);
-    internal_clock.Init(internal_clock_cfg);
-    internal_clock.SetCallback(ClockTimerCallback);
-    internal_clock.Start();
 
     //** Initialize Audio Callback */
 	hardware_manager->hw->SetAudioBlockSize(4); // number of samples handled per callback

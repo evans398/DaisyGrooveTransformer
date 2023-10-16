@@ -18,7 +18,7 @@ bool LIBRE_IS_READY = false;
 
 std::unique_ptr<HardwareManager> hardware_manager;
 std::unique_ptr<ClockManager> clock_manager;
-// std::unique_ptr<HardwareClock> hardware_clock;
+std::unique_ptr<HardwareClock> hardware_clock;
 std::unique_ptr<OutputBufferManager> output_buffer_manager;
 std::unique_ptr<UartLibreManager> uart_libre_manager;
 std::unique_ptr<InputBufferManager> input_buffer_manager;
