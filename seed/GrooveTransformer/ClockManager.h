@@ -38,17 +38,6 @@ struct ClockManager {
         this->hardware_manager = hardware_manager;
     }
 
-    void UpdatePeriod(float bpm){
-        // float period = static_cast<uint32_t>(internal_clock_freq_hz/clock_freq_hz);
-        // this->hardware_clock->SetPeriod(period);
-        // float bps                       = bpm / 60.0f; // convert to beats per second
-        // const float ppqn                = 96; // init pulses
-        // float clock_freq_hz             = ppqn * bpm * (1.0f/60.f); // clock frequency at ppqn resolution (1/60) is hz/bpm (so 120bpm is 2hz). One is a q note so we multiply by ppqn
-        // const float internal_clock_freq_hz = 200000000.0; // can be confirmed with hardware_clock.GetFreq()
-        // float period                  = internal_clock_freq_hz/clock_freq_hz;
-        // this->hardware_clock->SetPeriod(static_cast<uint32_t>(period));
-    }
-
     // Advance the clock index
     void AdvanceClockIndex() {
         if (ticks_from_start_idx == buffer_size_ticks - 1) { // reset metro index at end of buffer

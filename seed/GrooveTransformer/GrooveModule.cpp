@@ -1,9 +1,9 @@
 #include "GrooveModule.h"
 using namespace daisy;
 
-TimerHandle         hardware_timer;
-TimerHandle::Config internal_clock_cfg;
-const float         internal_clock_freq = 200000000; // can be confirmed with hardware_clock.GetFreq()
+TimerHandle         cv_clock_out;
+TimerHandle::Config cv_clock_out_cfg;
+const float         hardware_clock_freq_hz = 200000000; // can be confirmed with hardware_clock.GetFreq()
 bool led_on = true;
 
 MidiUartHandler uart_midi;
@@ -83,15 +83,18 @@ int main(void)
     input_buffer_manager = std::make_unique<InputBufferManager> (uart_libre_manager.get(), clock_manager.get(), hardware_manager.get());
     
     // ** Set up hardware_clock for external syncing */
-    internal_clock_cfg.periph     = TimerHandle::Config::Peripheral::TIM_5;
-    internal_clock_cfg.dir     = TimerHandle::Config::CounterDir::UP;
-    internal_clock_cfg.enable_irq = true;
-    float period                  = internal_clock_freq_hz/clock_freq_hz;
-    internal_clock_cfg.period     = static_cast<uint32_t>(period);
-    hardware_timer.Init(internal_clock_cfg);
-    hardware_timer.SetCallback(ClockTimerCallback);
-    hardware_timer.Start();
-    hardware_clock = std::make_unique<HardwareClock> (&hardware_timer, hardware_manager.get());
+    cv_clock_out_cfg.periph     = TimerHandle::Config::Peripheral::TIM_5;
+    cv_clock_out_cfg.dir        = TimerHandle::Config::CounterDir::UP;
+    cv_clock_out_cfg.enable_irq = true;
+    float bpm                   = 120.0f;
+    float ppqn                  = 24.0f;
+    float period_freq_hz = ppqn * bpm * (1.0f/60.0f) * 2;
+    float period                = hardware_clock_freq_hz/period_freq_hz;
+    cv_clock_out_cfg.period     = static_cast<uint32_t>(period);
+    cv_clock_out.Init(cv_clock_out_cfg);
+    cv_clock_out.SetCallback(ClockTimerCallback);
+    cv_clock_out.Start();
+    hardware_clock = std::make_unique<HardwareClock> (&cv_clock_out, hardware_manager.get());
     
     ui_components_manager = std::make_unique<UIComponentsManager> (
         hardware_manager.get(),
