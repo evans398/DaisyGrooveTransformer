@@ -144,6 +144,13 @@ struct UartMidiManager {
     //     uart_midi->SendMessage(data, 3);
     // }
 
+    void SendMidiClock(bool clock_high) {
+         uint8_t data[1] = { 0xF8 };
+         if (clock_high) {
+            uart_midi->SendMessage(data, 1);
+         }
+    }
+
     void SendMidiOutputs(int voice_idx, int velocity_int) {
         
         uint8_t channel = voice_idx;

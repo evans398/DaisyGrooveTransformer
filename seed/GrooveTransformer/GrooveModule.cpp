@@ -4,7 +4,7 @@ using namespace daisy;
 TimerHandle         cv_clock_out;
 TimerHandle::Config cv_clock_out_cfg;
 const float         hardware_clock_freq_hz = 200000000; // can be confirmed with hardware_clock.GetFreq()
-bool led_on = true;
+bool clock_high = true;
 
 MidiUartHandler uart_midi;
 UartHandler uart_libre;
@@ -26,22 +26,12 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
     }
 }
 
-// void UpdatePeriod(float bpm){
-//     // float period = static_cast<uint32_t>(internal_clock_freq_hz/clock_freq_hz);
-//     // this->hardware_clock->SetPeriod(period);
-//     float bps                       = bpm / 60.0f; // convert to beats per second
-//     const float ppqn                = 8; // init pulses
-//     float clock_freq_hz             = ppqn * bpm * (1.0f/60.f); // clock frequency at ppqn resolution (1/60) is hz/bpm (so 120bpm is 2hz). One is a q note so we multiply by ppqn
-//     const float internal_clock_freq_hz = 200000000; // can be confirmed with hardware_clock.GetFreq()
-//     float period                  = internal_clock_freq_hz/clock_freq_hz;
-//     hardware_clock.SetPeriod(static_cast<uint32_t>(period));
-// }
-
 void sendClockPulse(){
     // TODO make sure the rate that it sends clock is correct. currently it's divided 2 clock
     // TODO ties this with main clock start/stop
-    hardware_manager->clock_out.Write(led_on);
-    led_on = !led_on;
+    hardware_manager->clock_out.Write(clock_high);
+    uart_midi_manager->SendMidiClock(clock_high);
+    clock_high = !clock_high;
     // if (clock_manager->play_enabled) {
     // }
 }
@@ -82,6 +72,15 @@ int main(void)
     uart_libre_manager = std::make_unique<UartLibreManager> (&uart_libre, output_buffer_manager.get(), hardware_manager.get());
     input_buffer_manager = std::make_unique<InputBufferManager> (uart_libre_manager.get(), clock_manager.get(), hardware_manager.get());
     
+    uart_midi_manager = std::make_unique<UartMidiManager> (
+        &uart_midi,
+        output_buffer_manager.get(), 
+        input_buffer_manager.get(), 
+        uart_libre_manager.get(), 
+        clock_manager.get(),
+        hardware_manager.get()
+    );
+
     // ** Set up hardware_clock for external syncing */
     cv_clock_out_cfg.periph     = TimerHandle::Config::Peripheral::TIM_5;
     cv_clock_out_cfg.dir        = TimerHandle::Config::CounterDir::UP;
@@ -103,15 +102,6 @@ int main(void)
         output_buffer_manager.get(),
         clock_manager.get(),
         hardware_clock.get()
-    );
-
-    uart_midi_manager = std::make_unique<UartMidiManager> (
-        &uart_midi,
-        output_buffer_manager.get(), 
-        input_buffer_manager.get(), 
-        uart_libre_manager.get(), 
-        clock_manager.get(),
-        hardware_manager.get()
     );
     
     playback_manager = std::make_unique<PlaybackManager>(

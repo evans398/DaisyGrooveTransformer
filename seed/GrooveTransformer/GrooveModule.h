@@ -4,13 +4,13 @@
 
 #include "HardwareManager.h"
 #include "ClockManager.h"
-#include "HardwareClock.h"
 #include "OutputBufferManager.h"
 #include "Onset.h"
 #include "UartLibreManager.h"
 #include "InputBufferManager.h"
-#include "UIComponentsManager.h"
 #include "UartMidiManager.h"
+#include "HardwareClock.h"
+#include "UIComponentsManager.h"
 #include "PlaybackManager.h"
 
 
