@@ -103,7 +103,8 @@ int main(void)
         input_buffer_manager.get(),
         output_buffer_manager.get(),
         clock_manager.get(),
-        hardware_clock.get()
+        hardware_clock.get(),
+        uart_midi_manager.get()
     );
     
     playback_manager = std::make_unique<PlaybackManager>(

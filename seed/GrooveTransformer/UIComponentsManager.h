@@ -8,6 +8,7 @@ struct UIComponentsManager {
     OutputBufferManager* output_buffer_manager;
     ClockManager* clock_manager;
     HardwareClock* hardware_clock;
+    UartMidiManager* uart_midi_manager;
 
     std::array<std::unique_ptr<VoiceDensityPot>, NUM_OUTPUT_VOICES> voice_density_pots;
     std::array<std::unique_ptr<VoiceVelocityScalePot>, NUM_OUTPUT_VOICES> voice_velocity_scale_pots;
@@ -34,7 +35,8 @@ struct UIComponentsManager {
         InputBufferManager* input_buffer_manager,
         OutputBufferManager* output_buffer_manager,
         ClockManager* clock_manager,
-        HardwareClock* hardware_clock
+        HardwareClock* hardware_clock,
+        UartMidiManager* uart_midi_manager
     ) {
         //** Managers */
         this->hardware_manager = hardware_manager;
@@ -43,6 +45,7 @@ struct UIComponentsManager {
         this->output_buffer_manager = output_buffer_manager;
         this->clock_manager = clock_manager;
         this->hardware_clock = hardware_clock;
+        this->uart_midi_manager = uart_midi_manager;
 
         //** Components */
         for (int i=0; i<NUM_OUTPUT_VOICES; i++) {
@@ -64,7 +67,7 @@ struct UIComponentsManager {
         this->general_purpose_parameter_pot_2 = std::make_unique<GeneralPurposeParameterPot>(2, GP_POT_2, uart_libre_manager, hardware_manager);
         this->general_purpose_parameter_pot_3 = std::make_unique<GeneralPurposeParameterPot>(2, GP_POT_3, uart_libre_manager, hardware_manager);
         this->record_overdub_switch = std::make_unique<RecordOverdubSwitch>(uart_libre_manager, input_buffer_manager, hardware_manager);
-        this->play_stop_switch = std::make_unique<PlayStopSwitch>(hardware_manager, clock_manager);
+        this->play_stop_switch = std::make_unique<PlayStopSwitch>(hardware_manager, clock_manager, uart_midi_manager);
     };
 
     void PlayReadAndSetState() {
