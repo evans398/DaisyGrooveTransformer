@@ -151,6 +151,16 @@ struct UartMidiManager {
          }
     }
 
+    void SendMidiPlayStop(bool play_enabled) {
+        if (play_enabled) {
+            uint8_t data[1] = { 0xFA };
+            uart_midi->SendMessage(data, 1);
+        } else {
+            uint8_t data[1] = { 0xFC };
+            uart_midi->SendMessage(data, 1);
+        }     
+    }
+
     void SendMidiOutputs(int voice_idx, int velocity_int) {
         
         uint8_t channel = voice_idx;
