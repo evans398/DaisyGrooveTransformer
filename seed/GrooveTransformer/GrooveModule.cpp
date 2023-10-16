@@ -29,9 +29,11 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
 void sendClockPulse(){
     // TODO make sure the rate that it sends clock is correct. currently it's divided 2 clock
     // TODO ties this with main clock start/stop
-    hardware_manager->clock_out.Write(clock_high);
-    uart_midi_manager->SendMidiClock(clock_high);
-    clock_high = !clock_high;
+    if (clock_manager->play_enabled) {
+        hardware_manager->clock_out.Write(clock_high);
+        uart_midi_manager->SendMidiClock(clock_high);
+        clock_high = !clock_high;
+    }
     // if (clock_manager->play_enabled) {
     // }
 }
