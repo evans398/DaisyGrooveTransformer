@@ -529,14 +529,15 @@ struct PlayStopSwitch {
 
     void ReadAndSetState() {
         hardware_manager->play_stop_switch.Debounce();
-        if (hardware_manager->play_stop_switch.Pressed() && !play_enabled) {
-            hardware_manager->hw->PrintLine("PLAY ENABLED");
-            clock_manager->play_enabled = hardware_manager->play_stop_switch.Pressed();
-        }
-        if (!hardware_manager->play_stop_switch.Pressed() && play_enabled) {
-            hardware_manager->hw->PrintLine("PLAY DISABLED");
-            clock_manager->play_enabled = hardware_manager->play_stop_switch.Pressed();
-        }
+        // if (hardware_manager->play_stop_switch.Pressed() && !play_enabled) {
+        //     hardware_manager->hw->PrintLine("PLAY ENABLED");
+        //     clock_manager->play_enabled = hardware_manager->play_stop_switch.Pressed();
+        // }
+        // if (!hardware_manager->play_stop_switch.Pressed() && play_enabled) {
+        //     hardware_manager->hw->PrintLine("PLAY DISABLED");
+        //     clock_manager->play_enabled = hardware_manager->play_stop_switch.Pressed();
+        // }
+        clock_manager->play_enabled = hardware_manager->play_stop_switch.Pressed();
         play_enabled = hardware_manager->play_stop_switch.Pressed();
     }
 };
@@ -583,8 +584,9 @@ struct TempoPot {
         if (scaled_value != prev_value) {
             float bpm = ((scaled_value/100.f) * 120.f) + 60.f; // min tempo is 60, max is 180
             clock_freq_hz = bpm * (1.0f/60.f) * ppqn;
-            hardware_manager->hw->PrintLine("BPM: " FLT_FMT3, FLT_VAR3(bpm));
+            // hardware_manager->hw->PrintLine("BPM: " FLT_FMT3, FLT_VAR3(bpm));
             this->clock_manager->metro->SetFreq(clock_freq_hz);
+            this->clock_manager->UpdatePeriod(bpm);
         }
         prev_value = scaled_value;
     }

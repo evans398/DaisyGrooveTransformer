@@ -64,6 +64,10 @@ struct UIComponentsManager {
         this->play_stop_switch = std::make_unique<PlayStopSwitch>(hardware_manager, clock_manager);
     };
 
+    void PlayReadAndSetState() {
+        this->play_stop_switch->ReadAndSetState();
+    }
+
     void ReadUIComponents (){
         for (auto&& voice_density_pot : this->voice_density_pots) {
             voice_density_pot->TransmitNewValue(false);
