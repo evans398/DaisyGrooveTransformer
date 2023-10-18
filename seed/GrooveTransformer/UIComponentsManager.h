@@ -21,6 +21,7 @@ struct UIComponentsManager {
     std::unique_ptr<InterpolationButton> interpolation_button_a;
     std::unique_ptr<InterpolationButton> interpolation_button_b;
     std::unique_ptr<PresetPot> preset_pot;
+    std::unique_ptr<CVClockInput> cv_clock_input;
     std::unique_ptr<SaveButton> save_button;
     std::unique_ptr<ClearButton> clear_button;
     std::unique_ptr<GeneralPurposeParameterPot> general_purpose_parameter_pot_1;
@@ -61,6 +62,7 @@ struct UIComponentsManager {
         this->interpolation_button_a = std::make_unique<InterpolationButton>(InterpolationButtonName::BUTTON_A, uart_libre_manager, hardware_manager);
         this->interpolation_button_b = std::make_unique<InterpolationButton>(InterpolationButtonName::BUTTON_B, uart_libre_manager, hardware_manager);
         this->preset_pot = std::make_unique<PresetPot>(PRESET_KNOB, hardware_manager);
+        this->cv_clock_input = std::make_unique<CVClockInput>(CLOCK_IN, hardware_manager);
         this->save_button = std::make_unique<SaveButton>(this->preset_pot.get(), uart_libre_manager, hardware_manager);
         this->clear_button = std::make_unique<ClearButton>(uart_libre_manager, hardware_manager, input_buffer_manager);
         this->general_purpose_parameter_pot_1 = std::make_unique<GeneralPurposeParameterPot>(2, GP_POT_1, uart_libre_manager, hardware_manager);
@@ -73,6 +75,7 @@ struct UIComponentsManager {
     void PlayReadAndSetState() {
         this->play_stop_switch->ReadAndSetState();
         this->tempo_pot->ReadAndSetTempo();
+        // this->cv_clock_input->CheckIfGateChange();
     }
 
     void ReadUIComponents (){
@@ -97,6 +100,7 @@ struct UIComponentsManager {
         this->play_stop_switch->ReadAndSetState();
         this->tempo_pot->ReadAndSetTempo();
         this->shift_button->Pressed();
+        this->cv_clock_input->CheckIfGateChange();
     }
 
     void ObserveSAPMessage() {

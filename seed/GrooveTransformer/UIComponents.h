@@ -370,6 +370,52 @@ struct PresetPot {
     }
 };
 
+struct CVClockInput {
+    int adc_channel;
+    HardwareManager* hardware_manager;
+    bool gate_is_high = false;
+    int gate_counter = 0;
+    int gate_period = 24;
+    float prev_ms = 0;
+
+    CVClockInput(enum AdcChannel adc_channel, HardwareManager* hardware_manager) {
+        this->adc_channel = adc_channel;
+        this->hardware_manager = hardware_manager;
+    }
+
+    bool GateIsHigh(){
+        float v_level = this->hardware_manager->hw->adc.GetFloat(this->adc_channel);
+        hardware_manager->hw->PrintLine(" v level " FLT_FMT3, FLT_VAR3(v_level));
+        return v_level > 0;
+    }
+
+    void CheckIfGateChange(){
+        if (!GateIsHigh() && gate_is_high) {
+            ReceivedTrigger();
+            hardware_manager->hw->PrintLine("trig received");
+        } 
+        gate_is_high = GateIsHigh();
+    }
+
+    float ms_to_bpm(float ms)
+    {
+        return 60000 / ms;
+    }   
+
+    void ReceivedTrigger() {
+        gate_counter++;
+        if(gate_counter == 24)
+        {
+            uint32_t ms   = System::GetNow();
+            uint32_t diff = ms - prev_ms;
+            uint32_t bpm  = ms_to_bpm(diff);
+            clock_man_bpm = bpm;
+            prev_ms = ms;
+            gate_counter = 0;
+        }
+    }
+};
+
 struct SaveButton {
     PresetPot* preset_pot;
     UartLibreManager* uart_libre_manager;
