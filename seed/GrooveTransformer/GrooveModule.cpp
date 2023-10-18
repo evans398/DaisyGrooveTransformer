@@ -52,20 +52,19 @@ int main(void)
     uart_conf.pin_config.rx = Pin(PORTA, 3);
 
     MidiUartHandler::Config uart_midi_config;
-    
-    // Initialize the uart_libre peripheral and start the DMA transmit
-    uart_libre.Init(uart_conf);
-
     uart_midi.Init(uart_midi_config); // Initialize the uart_libre peripheral and start the DMA transmit
-
-    /** Start the FIFO Receive */
-    uart_libre.DmaReceiveFifo();
-
     uart_midi.StartReceive(); // Start the FIFO Receive
+    
+    // // Initialize the uart_libre peripheral and start the DMA transmit
+    // uart_libre.Init(uart_conf); 
+
+    // /** Start the FIFO Receive */
+    // uart_libre.DmaReceiveFifo();
+
 
     // // ** Initialize logger */
-	// hardware_manager->hw->StartLog(true);
-    // hardware_manager->hw->PrintLine("DAISY ONLINE");
+	hardware_manager->hw->StartLog(true);
+    hardware_manager->hw->PrintLine("DAISY ONLINE");
 
     // ** Init Managers */
     clock_manager = std::make_unique<ClockManager> (&metro, hardware_manager.get());
@@ -151,10 +150,11 @@ int main(void)
         if (clock_manager->ticks_from_start_idx % 24 == 0) {
             ui_components_manager->ReadUIComponents();
         }
-        uart_libre_manager->HandleLibreUart();
+
+        // uart_libre_manager->HandleLibreUart();
         ui_components_manager->ObserveSAPMessage();
         input_buffer_manager->ObserveSAPMessage();
         input_buffer_manager->ObserveRecordBuffer(); //This must be called before Midi is Handled
-        uart_midi_manager->HandleMidiUart();  
+        uart_midi_manager->HandleMidiUart();
     }
 }

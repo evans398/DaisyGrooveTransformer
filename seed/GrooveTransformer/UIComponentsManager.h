@@ -72,6 +72,7 @@ struct UIComponentsManager {
 
     void PlayReadAndSetState() {
         this->play_stop_switch->ReadAndSetState();
+        this->tempo_pot->ReadAndSetTempo();
     }
 
     void ReadUIComponents (){

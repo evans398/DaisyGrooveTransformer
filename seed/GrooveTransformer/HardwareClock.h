@@ -4,32 +4,31 @@ using namespace daisy;
 using namespace daisysp;
 
 struct HardwareClock {
-    /** Clock static parameters */
-    float bpm                       = 120.0f; // initialize BPM to 120
-    float bps                       = bpm / 60.0f; // convert to beats per second
-    const float ppqn                = 48.0f; // init pulses
-    float clock_freq_hz             = ppqn * bps; // clock frequency at ppqn resolution (1/60) is hz/bpm (so 120bpm is 2hz). One is a q note so we multiply by ppqn
-    const float internal_clock_freq_hz = 200000000.0f; // can be confirmed with hardware_clock.GetFreq()   
+    /** Clock parameters */
+    float bpm                       = 0.0f; // initial BPM is set by knob position
+    const float ppqn                = 24.0f; // init pulses
+    const float internal_clock_freq_hz = 200000000.0f; // can be confirmed with cv_clock_out.GetFreq()
+    float period_freq_hz = 0.0f; //init to zero   
+
 
     /** Clock */
-    TimerHandle* hardware_clock;
-    bool led_on = true;
-
+    TimerHandle* cv_clock_out;
     HardwareManager* hardware_manager;
 
     /** Clock Params */
     bool play_enabled = true;
 
-    HardwareClock(TimerHandle* hardware_clock, HardwareManager* hardware_manager){
-        this->hardware_clock = hardware_clock;
+    HardwareClock(TimerHandle* cv_clock_out, HardwareManager* hardware_manager){
+        this->cv_clock_out = cv_clock_out;
         this->hardware_manager = hardware_manager;
     }
 
     void UpdatePeriod(float bpm){
-        float clock_freq_hz = this->ppqn * bpm * (1.0f/60.0f);
-        float period = static_cast<uint32_t>(this->internal_clock_freq_hz/clock_freq_hz);
-        this->hardware_clock->SetPeriod(period);
+        /** Period frequency at ppqn resolution (1/60) is hz/bpm (120bpm is 2hz). One beat is a q note so we multiply by ppqn. 
+         We double this value because the timer interrupt puts clock low on one call and high the nex callt*/
+        this->bpm = bpm;
+        this->period_freq_hz = this->ppqn * this->bpm * (1.0f/60.0f) * 2;
+        float period_freq_ticks = static_cast<uint32_t>(this->internal_clock_freq_hz/this->period_freq_hz);
+        this->cv_clock_out->SetPeriod(period_freq_ticks);
     }
-
-   
 };

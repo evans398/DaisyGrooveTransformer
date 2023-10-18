@@ -593,14 +593,15 @@ struct TempoPot {
     }
 
     void ReadAndSetTempo() {
-        int scaled_value = ScaleTempoPotValue(this->GetValue());
-        if (scaled_value != prev_value) {
-            float bpm = ((scaled_value/100.f) * 120.f) + 60.f; // min tempo is 60, max is 180
-            clock_freq_hz = bpm * (1.0f/60.f) * ppqn;
-            // hardware_manager->hw->PrintLine("BPM: " FLT_FMT3, FLT_VAR3(bpm));
-            this->clock_manager->metro->SetFreq(clock_freq_hz);
-            this->hardware_clock->UpdatePeriod(bpm);
-        }
-        prev_value = scaled_value;
+        this->hardware_clock->UpdatePeriod(clock_man_bpm);
+        // int scaled_value = ScaleTempoPotValue(this->GetValue());
+        // if (scaled_value != prev_value) {
+        //     float bpm = ((scaled_value/100.f) * 120.f) + 60.f; // min tempo is 60, max is 180
+        //     clock_freq_hz = bpm * (1.0f/60.f) * ppqn;
+        //     // hardware_manager->hw->PrintLine("BPM: " FLT_FMT3, FLT_VAR3(bpm));
+        //     this->clock_manager->metro->SetFreq(clock_freq_hz);
+        //     this->hardware_clock->UpdatePeriod(bpm);
+        // }
+        // prev_value = scaled_value;
     }
 };

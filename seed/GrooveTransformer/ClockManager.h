@@ -4,10 +4,10 @@ using namespace daisy;
 using namespace daisysp;
 
 /** Clock static parameters */
-float bpm                       = 120.0f; // initialize BPM to 120
-float bps                       = bpm / 60.0f; // convert to beats per second
+float clock_man_bpm                       = 145.0f; // initialize BPM to 120
+float bps                       = clock_man_bpm / 60.0f; // convert to beats per second
 const float ppqn                = 96; // init pulses
-float clock_freq_hz             = ppqn * bpm * (1.0f/60.f); // clock frequency at ppqn resolution (1/60) is hz/bpm (so 120bpm is 2hz). One is a q note so we multiply by ppqn
+float clock_freq_hz             = ppqn * clock_man_bpm * (1.0f/60.f); // clock frequency at ppqn resolution (1/60) is hz/bpm (so 120bpm is 2hz). One is a q note so we multiply by ppqn
 const float internal_clock_freq_hz = 200000000; // can be confirmed with hardware_clock.GetFreq()
 
 /** Rec loop buffer static parameters */
