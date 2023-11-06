@@ -24,6 +24,18 @@ int RoundScaledValue(int scaled_value) {
     return rounded_value;
 }
 
+int ScaleInterpolationPotValue(float value) {
+    float scaled_value = value * 100.;
+    int scaled_value_int = (int) scaled_value;
+    if (scaled_value > 99) {
+        return 100;
+    }
+    if (scaled_value < 1) {
+        return 0;
+    }
+    return scaled_value_int;
+}
+
 int ScalePotValue(float value) {
     float scaled_value = value * 100.;
     int scaled_value_int = (int) scaled_value;
@@ -402,7 +414,7 @@ struct InterpolationPot {
     }
 
     int GetScaledValue(){
-        return ScalePotValue(this->GetValue());
+        return ScaleInterpolationPotValue(this->GetValue());
     }
 
     void TransmitNewValue(bool force_transmit){
