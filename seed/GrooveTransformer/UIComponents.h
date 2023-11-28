@@ -24,6 +24,18 @@ int RoundScaledValue(int scaled_value) {
     return rounded_value;
 }
 
+int ScaleInterpolationPotValue(float value) {
+    float scaled_value = value * 100.;
+    int scaled_value_int = (int) scaled_value;
+    if (scaled_value > 99) {
+        return 100;
+    }
+    if (scaled_value < 1) {
+        return 0;
+    }
+    return scaled_value_int;
+}
+
 int ScalePotValue(float value) {
     float scaled_value = value * 100.;
     int scaled_value_int = (int) scaled_value;
@@ -186,7 +198,7 @@ struct InputGrooveOffsetPot {
     }
 };
 
-struct UncertaintyPot {
+struct GPCV {
     int mux_channel;
     int mux_idx;
     UartLibreManager* uart_libre_manager;
@@ -194,16 +206,12 @@ struct UncertaintyPot {
     float prev_scaled_value;
     // add cv input to this struct
 
-    UncertaintyPot(int mux_channel, int mux_idx, UartLibreManager* uart_libre_manager, HardwareManager* hardware_manager) {
+    GPCV(int mux_channel, int mux_idx, UartLibreManager* uart_libre_manager, HardwareManager* hardware_manager) {
         this->mux_channel = mux_channel;
         this->mux_idx = mux_idx;
         this->uart_libre_manager = uart_libre_manager;
         this->hardware_manager = hardware_manager;
         prev_scaled_value = GetScaledValue();
-    }
-
-    void UpdateValueWithCvInput(float value_from_cv_input){
-        //TODO knob becomes attentuator
     }
 
     float GetValue(){
@@ -212,15 +220,6 @@ struct UncertaintyPot {
 
     int GetScaledValue(){
         return ScalePotValue(this->GetValue());
-    }
-
-    void TransmitNewValue(bool force_transmit){
-        int scaled_value = GetScaledValue();
-        if (scaled_value != prev_scaled_value || force_transmit) {
-            hardware_manager->hw->PrintLine("UNCERTAINTY value: " FLT_FMT3, FLT_VAR3(scaled_value));
-            this->uart_libre_manager->TransmitUIParameterValue(ModelParameter::UNCERTAINTY, scaled_value);
-        }
-        this->prev_scaled_value = scaled_value;
     }
 };
 
@@ -244,7 +243,7 @@ struct InterpolationPot {
     }
 
     int GetScaledValue(){
-        return ScalePotValue(this->GetValue());
+        return ScaleInterpolationPotValue(this->GetValue());
     }
 
     void TransmitNewValue(bool force_transmit){
@@ -254,6 +253,74 @@ struct InterpolationPot {
             this->uart_libre_manager->TransmitUIParameterValue(ModelParameter::INTERPOLATION_POSITION, scaled_value);
         }
         this->prev_scaled_value = scaled_value;
+    }
+};
+
+struct GeneralPurposeParameterPot {
+    int mux_channel;
+    int mux_idx;
+    int general_purpose_pot_index;
+    UartLibreManager* uart_libre_manager;
+    HardwareManager* hardware_manager;
+    GPCV* general_purpose_cv_input;
+    enum ModelParameter model_parameter;
+    float prev_scaled_value;
+
+    GeneralPurposeParameterPot(
+        int mux_channel, 
+        int mux_idx, 
+        UartLibreManager* uart_libre_manager, 
+        HardwareManager* hardware_manager,
+        GPCV* general_purpose_cv_input,
+        enum ModelParameter model_parameter) {
+        this->mux_channel=mux_channel;
+        this->mux_idx=mux_idx;
+        this->uart_libre_manager=uart_libre_manager;
+        this->hardware_manager=hardware_manager;
+        this->general_purpose_cv_input=general_purpose_cv_input;
+        this->model_parameter=model_parameter;
+        this->general_purpose_pot_index = mux_idx;
+        prev_scaled_value = GetScaledValue();
+    }
+
+    float GetValue(){
+        return this->hardware_manager->hw->adc.GetMuxFloat(this->mux_channel, this->mux_idx);
+    }
+
+    int GetScaledValue(){
+        return ScalePotValue(this->GetValue());
+    }
+
+    // void UpdateValueWithCvInput(float scaled_value_from_cv_input) {
+    //     this->cv_value = scaled_value_from_cv_input;
+    //     hardware_manager->hw->Print("GEN PURP %d", general_purpose_pot_index);
+    //     hardware_manager->hw->PrintLine(" UPDATING CV VALUE: " FLT_FMT3, FLT_VAR3(scaled_value_from_cv_input));
+    //     this->TransmitNewValue(true);
+    // }
+
+    void TransmitNewValue(bool force_transmit){
+        int scaled_pot_value = GetScaledValue();
+        int combined_value = this->general_purpose_cv_input->GetScaledValue() + scaled_pot_value;
+        if (combined_value > 100) {
+            combined_value = 100;
+        }
+        if (combined_value != prev_scaled_value || force_transmit) {
+            switch(this->model_parameter) {
+                case ModelParameter::GENERAL_PURPOSE:
+                    hardware_manager->hw->Print("GEN PURP %d", general_purpose_pot_index);
+                    hardware_manager->hw->PrintLine(" value: " FLT_FMT3, FLT_VAR3(combined_value));
+                    this->uart_libre_manager->TransmitUIIndexedParameterValue(this->model_parameter, this->general_purpose_pot_index+1, combined_value);
+                    break;
+                case ModelParameter::UNCERTAINTY:
+                    hardware_manager->hw->PrintLine("UNCERTAINTY VALUE: " FLT_FMT3, FLT_VAR3(combined_value));
+                    this->uart_libre_manager->TransmitUIParameterValue(ModelParameter::UNCERTAINTY, combined_value);
+                    break;
+                default:
+                    break;
+            }
+            
+        }
+        this->prev_scaled_value = combined_value;
     }
 };
 
@@ -328,6 +395,99 @@ struct InterpolationButton {
     }
 };
 
+struct GrooveGate {
+    int adc_channel;
+    HardwareManager* hardware_manager;
+    float prev_scaled_value;
+
+    GrooveGate(enum AdcChannel adc_channel, HardwareManager* hardware_manager) {
+        this->adc_channel = adc_channel;
+        this->hardware_manager = hardware_manager;
+        this->prev_scaled_value = GetScaledValue();
+    }
+
+    float GetValue(){
+        return this->hardware_manager->hw->adc.GetFloat(this->adc_channel);
+    }
+
+    int GetScaledValue(){
+        return ScalePotValue(this->GetValue());
+    }
+
+    void TransmitNewValue(bool force_transmit){
+        int scaled_value = GetScaledValue();
+        // hardware_manager->hw->PrintLine("CV GP 1: " FLT_FMT3, FLT_VAR3(scaled_value));
+        // int scaled_value = GetScaledValue();
+        if (scaled_value != prev_scaled_value || force_transmit) {
+            hardware_manager->hw->PrintLine("Groove Gate: " FLT_FMT3, FLT_VAR3(scaled_value));
+            // this->uart_libre_manager->TransmitUIParameterValue(ModelParameter::UNCERTAINTY, scaled_value);
+        }
+        this->prev_scaled_value = scaled_value;
+    }
+};
+
+struct GrooveCV {
+    int adc_channel;
+    HardwareManager* hardware_manager;
+    float prev_scaled_value;
+
+    GrooveCV(enum AdcChannel adc_channel, HardwareManager* hardware_manager) {
+        this->adc_channel = adc_channel;
+        this->hardware_manager = hardware_manager;
+        this->prev_scaled_value = GetScaledValue();
+    }
+
+    float GetValue(){
+        return this->hardware_manager->hw->adc.GetFloat(this->adc_channel);
+    }
+
+    int GetScaledValue(){
+        return ScalePotValue(this->GetValue());
+    }
+
+    void TransmitNewValue(bool force_transmit){
+        int scaled_value = GetScaledValue();
+        // hardware_manager->hw->PrintLine("CV GP 1: " FLT_FMT3, FLT_VAR3(scaled_value));
+        // int scaled_value = GetScaledValue();
+        if (scaled_value != prev_scaled_value || force_transmit) {
+            hardware_manager->hw->PrintLine("Groove CV: " FLT_FMT3, FLT_VAR3(scaled_value));
+            // this->uart_libre_manager->TransmitUIParameterValue(ModelParameter::UNCERTAINTY, scaled_value);
+        }
+        this->prev_scaled_value = scaled_value;
+    }
+};
+
+struct CVClockInput {
+    int adc_channel;
+    HardwareManager* hardware_manager;
+    float prev_scaled_value;
+
+    CVClockInput(enum AdcChannel adc_channel, HardwareManager* hardware_manager) {
+        this->adc_channel = adc_channel;
+        this->hardware_manager = hardware_manager;
+        this->prev_scaled_value = GetScaledValue();
+    }
+
+    float GetValue(){
+        return this->hardware_manager->hw->adc.GetFloat(this->adc_channel);
+    }
+
+    int GetScaledValue(){
+        return ScalePotValue(this->GetValue());
+    }
+
+    void TransmitNewValue(bool force_transmit){
+        int scaled_value = GetScaledValue();
+        // hardware_manager->hw->PrintLine("CV GP 1: " FLT_FMT3, FLT_VAR3(scaled_value));
+        // int scaled_value = GetScaledValue();
+        if (scaled_value != prev_scaled_value || force_transmit) {
+            hardware_manager->hw->PrintLine("CV CLOCK INPUT: " FLT_FMT3, FLT_VAR3(scaled_value));
+            // this->uart_libre_manager->TransmitUIParameterValue(ModelParameter::UNCERTAINTY, scaled_value);
+        }
+        this->prev_scaled_value = scaled_value;
+    }
+};
+
 struct PresetPot {
     int adc_channel;
     HardwareManager* hardware_manager;
@@ -369,6 +529,81 @@ struct PresetPot {
         return preset_index;
     }
 };
+
+// struct CVClockInput {
+//     int mux_channel;
+//     int mux_idx;
+//     UartLibreManager* uart_libre_manager;
+//     HardwareManager* hardware_manager;
+//     // float prev_scaled_value;
+//     bool gate_is_high = false;
+//     int gate_counter = 0;
+//     int gate_period = 24;
+//     float prev_ms = 0;
+//     // add cv input to this struct
+
+//     CVClockInput(int mux_channel, int mux_idx, UartLibreManager* uart_libre_manager, HardwareManager* hardware_manager) {
+//         this->mux_channel = mux_channel;
+//         this->mux_idx = mux_idx;
+//         this->uart_libre_manager = uart_libre_manager;
+//         this->hardware_manager = hardware_manager;
+//         // prev_scaled_value = GetScaledValue();
+//     }
+
+//     bool GateIsHigh(){
+//         float v_level = this->hardware_manager->hw->adc.GetMuxFloat(this->mux_channel, this->mux_idx);
+//         hardware_manager->hw->PrintLine(" v level " FLT_FMT3, FLT_VAR3(v_level));
+//         return v_level > 0.2;
+//     }
+
+//     void CheckIfGateChange(){
+//         if (!GateIsHigh() && gate_is_high) {
+//             ReceivedTrigger();
+//             hardware_manager->hw->PrintLine("trig received");
+//         } 
+//         gate_is_high = GateIsHigh();
+//     }
+
+//     float ms_to_bpm(float ms)
+//     {
+//         return 60000 / ms;
+//     }   
+
+//     void ReceivedTrigger() {
+//         gate_counter++;
+//         if(gate_counter == 24)
+//         {
+//             uint32_t ms   = System::GetNow();
+//             uint32_t diff = ms - prev_ms;
+//             uint32_t bpm  = ms_to_bpm(diff);
+//             clock_man_bpm = bpm;
+//             prev_ms = ms;
+//             gate_counter = 0;
+//         }
+//     }
+
+
+//     // float GetValue(){
+//     //     return this->hardware_manager->hw->adc.GetFloat(this->adc_channel);
+//     // }
+
+//     // int GetScaledValue(){
+//     //     return ScalePotValue(this->GetValue());
+//     // }
+
+//     // void TransmitNewValue(bool force_transmit){
+//     //     int scaled_value = GetScaledValue();
+//     //     // hardware_manager->hw->PrintLine("CV GP 1: " FLT_FMT3, FLT_VAR3(scaled_value));
+//     //     // int scaled_value = GetScaledValue();
+//     //     if (scaled_value != prev_scaled_value || force_transmit) {
+//     //         hardware_manager->hw->PrintLine("CLOCK IN: " FLT_FMT3, FLT_VAR3(scaled_value));
+//     //     }
+//     //     this->prev_scaled_value = scaled_value;
+//     // }
+
+
+
+// };
 
 struct SaveButton {
     PresetPot* preset_pot;
@@ -426,47 +661,6 @@ struct ClearButton {
             input_buffer_manager->ClearBuffer();
         }
         prev_state_pressed = hardware_manager->clear_button.Pressed();
-    }
-};
-
-struct GeneralPurposeParameterPot {
-    int mux_channel;
-    int mux_idx;
-    int general_purpose_pot_index;
-    UartLibreManager* uart_libre_manager;
-    HardwareManager* hardware_manager;
-    float prev_scaled_value;
-    //add cv input to this struct
-
-    GeneralPurposeParameterPot(int mux_channel, int mux_idx, UartLibreManager* uart_libre_manager, HardwareManager* hardware_manager) {
-        this->mux_channel=mux_channel;
-        this->mux_idx=mux_idx;
-        this->uart_libre_manager=uart_libre_manager;
-        this->hardware_manager=hardware_manager;
-        this->general_purpose_pot_index = mux_idx;
-        prev_scaled_value = GetScaledValue();
-    }
-
-    void UpdateValueWithCvInput(float value_from_cv_input) {
-        //TODO implement
-    }
-
-    float GetValue(){
-        return this->hardware_manager->hw->adc.GetMuxFloat(this->mux_channel, this->mux_idx);
-    }
-
-    int GetScaledValue(){
-        return ScalePotValue(this->GetValue());
-    }
-
-    void TransmitNewValue(bool force_transmit){
-        int scaled_value = GetScaledValue();
-        if (scaled_value != prev_scaled_value || force_transmit) {
-            hardware_manager->hw->Print("GEN PURP %d", general_purpose_pot_index);
-            hardware_manager->hw->PrintLine(" value: " FLT_FMT3, FLT_VAR3(scaled_value));
-            this->uart_libre_manager->TransmitUIIndexedParameterValue(ModelParameter::GENERAL_PURPOSE, this->general_purpose_pot_index+1, scaled_value);
-        }
-        this->prev_scaled_value = scaled_value;
     }
 };
 

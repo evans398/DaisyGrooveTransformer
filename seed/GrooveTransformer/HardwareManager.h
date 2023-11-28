@@ -43,7 +43,7 @@ enum Mux_2_Index {
     GP_CV_1,
     GP_CV_2,
     GP_CV_3,
-    RANDOMNESS_CV
+    UNCERTAINTY_CV
 };
 
 enum Switch_Daisy_Pin_Index {

@@ -9,6 +9,13 @@ struct UartMidiManager {
     ClockManager* clock_manager;
     HardwareManager* hardware_manager;
 
+    uint32_t prev_ms = 0;
+    uint16_t tt_count = 0;
+
+    // float    bpm_to_freq(uint32_t tempo);
+    // uint32_t ms_to_bpm(uint32_t ms);
+    // void HandleSystemRealTime(SystemRealTimeType srt_type);
+
     /** Incoming MIDI variables */
     bool is_onset                = true; // flag to only capture onset of a midi note
     bool midi_note_is_on         = false; // flag to know if MIDI notes is currently on
@@ -37,13 +44,65 @@ struct UartMidiManager {
         }
     }
 
+    float bpm_to_freq(uint32_t tempo)
+    {
+        return tempo / 60.0f;
+    }
+
+    uint32_t ms_to_bpm(uint32_t ms)
+    {
+        return 60000 / ms;
+    }   
+
+    void HandleSystemRealTime(SystemRealTimeType srt_type){
+        switch(srt_type)
+        {
+            // 0xFA - start
+            case Start: break;
+
+            // 0xFC - stop
+            case Stop: break;
+
+    // #ifdef DEBUG
+    //         default:
+    //             hw.seed.PrintLine("MIDI SystemRealTime: %x", m.srt_type);
+    //             break;
+    // #endif
+
+            // MIDI Clock -  24 clicks per quarter note
+            case TimingClock:
+                tt_count++;
+                if(tt_count == 24)
+                {
+                    uint32_t ms   = System::GetNow();
+                    uint32_t diff = ms - prev_ms;
+                    uint32_t bpm  = ms_to_bpm(diff);
+                    clock_man_bpm = bpm;
+    // #ifdef DEBUG
+    //                 hw.seed.PrintLine("msec=%d, diff=%d, BPM=%d", ms, diff, bpm);
+    // #endif
+                    // if(bpm >= TTEMPO_MIN && bpm <= TTEMPO_MAX)
+                    // {
+                    //     lfo.SetFreq(bpm_to_freq(bpm));
+                    // }
+
+                    prev_ms = ms;
+                    tt_count = 0;
+                }
+                break;
+        }
+    }
+
     void HandleMidiMessage(MidiEvent midi_event)
     {
         /** Pull the oldest one from the list... */
+        int midi_type_enum_value = static_cast<int>(midi_event.type);
+        hardware_manager->hw->PrintLine("midi_event.type: %d", midi_event.type);
         switch(midi_event.type)
         {
             case NoteOn:
             {
+                hardware_manager->hw->Print("RECEIVED MIDI NOTE");
                 // midi information
                 auto note_msg = midi_event.AsNoteOn();
                 float input_velocity = note_msg.velocity/127.f;
@@ -76,6 +135,11 @@ struct UartMidiManager {
             break;
             // For now ignore all other message types
             default: {}
+            break;
+            case SystemRealTime:
+            {
+                HandleSystemRealTime(midi_event.srt_type);
+            }
             break;
         }
     }
