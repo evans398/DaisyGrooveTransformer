@@ -7,7 +7,6 @@ struct UIComponentsManager {
     InputBufferManager* input_buffer_manager;
     OutputBufferManager* output_buffer_manager;
     ClockManager* clock_manager;
-    HardwareClock* hardware_clock;
     UartMidiManager* uart_midi_manager;
 
     std::array<std::unique_ptr<VoiceDensityPot>, NUM_OUTPUT_VOICES> voice_density_pots;
@@ -35,7 +34,6 @@ struct UIComponentsManager {
         InputBufferManager* input_buffer_manager,
         OutputBufferManager* output_buffer_manager,
         ClockManager* clock_manager,
-        HardwareClock* hardware_clock,
         UartMidiManager* uart_midi_manager
     ) {
         //** Managers */
@@ -44,7 +42,6 @@ struct UIComponentsManager {
         this->input_buffer_manager = input_buffer_manager;
         this->output_buffer_manager = output_buffer_manager;
         this->clock_manager = clock_manager;
-        this->hardware_clock = hardware_clock;
         this->uart_midi_manager = uart_midi_manager;
 
         //** Components */
@@ -55,7 +52,7 @@ struct UIComponentsManager {
         this->input_groove_velocity_pot = std::make_unique<InputGrooveVelocityPot>(0, INPUT_GROOVE_VEL_POT, uart_libre_manager, hardware_manager);
         this->input_groove_offset_pot = std::make_unique<InputGrooveOffsetPot>(0, INPUT_GROOVE_OFF_POT, uart_libre_manager, hardware_manager);
         this->uncertainty_pot = std::make_unique<UncertaintyPot>(1, UNCERTAINTY_POT, uart_libre_manager, hardware_manager);
-        this->tempo_pot = std::make_unique<TempoPot>(1, TEMPO_POT, clock_manager, hardware_manager, hardware_clock);
+        this->tempo_pot = std::make_unique<TempoPot>(1, TEMPO_POT, clock_manager, hardware_manager);
         this->interpolation_pot = std::make_unique<InterpolationPot>(2, INTERPOLATION_POT, uart_libre_manager, hardware_manager);
         this->shift_button = std::make_unique<ShiftButton>(this->hardware_manager);
         this->interpolation_button_a = std::make_unique<InterpolationButton>(InterpolationButtonName::BUTTON_A, uart_libre_manager, hardware_manager);

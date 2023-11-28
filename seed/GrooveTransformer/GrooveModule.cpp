@@ -1,8 +1,8 @@
 #include "GrooveModule.h"
 using namespace daisy;
 
-TimerHandle         cv_clock_out;
-TimerHandle::Config cv_clock_out_cfg;
+TimerHandle         hardware_clock;
+TimerHandle::Config hardware_clock_cfg;
 const float         hardware_clock_freq_hz = 200000000; // can be confirmed with hardware_clock.GetFreq()
 bool clock_high = true;
 
@@ -68,7 +68,7 @@ int main(void)
     // hardware_manager->hw->PrintLine("DAISY ONLINE");
 
     // ** Init Managers */
-    clock_manager = std::make_unique<ClockManager> (&cv_clock_out, hardware_manager.get());
+    clock_manager = std::make_unique<ClockManager> (&hardware_clock, hardware_manager.get());
     // hardware_clock = std::make_unique<HardwareClock> (hardware_manager.get());
     output_buffer_manager = std::make_unique<OutputBufferManager> (hardware_manager.get());
     uart_libre_manager = std::make_unique<UartLibreManager> (&uart_libre, output_buffer_manager.get(), hardware_manager.get());
@@ -84,18 +84,17 @@ int main(void)
     );
 
     // ** Set up hardware_clock for external syncing */
-    cv_clock_out_cfg.periph     = TimerHandle::Config::Peripheral::TIM_5;
-    cv_clock_out_cfg.dir        = TimerHandle::Config::CounterDir::UP;
-    cv_clock_out_cfg.enable_irq = true;
+    hardware_clock_cfg.periph     = TimerHandle::Config::Peripheral::TIM_5;
+    hardware_clock_cfg.dir        = TimerHandle::Config::CounterDir::UP;
+    hardware_clock_cfg.enable_irq = true;
     float bpm                   = 120.0f;
     float ppqn                  = 24.0f;
     float period_freq_hz = ppqn * bpm * (1.0f/60.0f) * 2;
     float period                = hardware_clock_freq_hz/period_freq_hz;
-    cv_clock_out_cfg.period     = static_cast<uint32_t>(period);
-    cv_clock_out.Init(cv_clock_out_cfg);
-    cv_clock_out.SetCallback(ClockTimerCallback);
-    cv_clock_out.Start();
-    hardware_clock = std::make_unique<HardwareClock> (&cv_clock_out, hardware_manager.get());
+    hardware_clock_cfg.period     = static_cast<uint32_t>(period);
+    hardware_clock.Init(hardware_clock_cfg);
+    hardware_clock.SetCallback(ClockTimerCallback);
+    hardware_clock.Start();
     
     ui_components_manager = std::make_unique<UIComponentsManager> (
         hardware_manager.get(),
@@ -103,7 +102,6 @@ int main(void)
         input_buffer_manager.get(),
         output_buffer_manager.get(),
         clock_manager.get(),
-        hardware_clock.get(),
         uart_midi_manager.get()
     );
     
