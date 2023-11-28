@@ -31,6 +31,7 @@ void sendClockPulse(){
     // TODO ties this with main clock start/stop
     if (clock_manager->play_enabled) {
         hardware_manager->clock_out.Write(clock_high);
+        // clock_manager->ClockOut();
         uart_midi_manager->SendMidiClock(clock_high);
         clock_high = !clock_high;
     }
