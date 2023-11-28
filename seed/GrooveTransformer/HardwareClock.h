@@ -25,11 +25,11 @@ struct HardwareClock {
         this->hardware_manager = hardware_manager;
     }
 
-    void UpdatePeriod(float bpm){
-        float clock_freq_hz = this->ppqn * bpm * (1.0f/60.0f);
-        float period = static_cast<uint32_t>(this->internal_clock_freq_hz/clock_freq_hz);
-        this->hardware_clock->SetPeriod(period);
-    }
+    // void UpdatePeriod(float bpm){
+    //     float clock_freq_hz = this->ppqn * bpm * (1.0f/60.0f);
+    //     float period = static_cast<uint32_t>(this->internal_clock_freq_hz/clock_freq_hz);
+    //     this->hardware_clock->SetPeriod(period);
+    // }
 
    
 };

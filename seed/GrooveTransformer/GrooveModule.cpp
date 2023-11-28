@@ -68,7 +68,7 @@ int main(void)
     // hardware_manager->hw->PrintLine("DAISY ONLINE");
 
     // ** Init Managers */
-    clock_manager = std::make_unique<ClockManager> (&metro, hardware_manager.get());
+    clock_manager = std::make_unique<ClockManager> (&cv_clock_out, hardware_manager.get());
     // hardware_clock = std::make_unique<HardwareClock> (hardware_manager.get());
     output_buffer_manager = std::make_unique<OutputBufferManager> (hardware_manager.get());
     uart_libre_manager = std::make_unique<UartLibreManager> (&uart_libre, output_buffer_manager.get(), hardware_manager.get());
