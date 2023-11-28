@@ -76,8 +76,8 @@ struct UartMidiManager {
                 {
                     uint32_t ms   = System::GetNow();
                     uint32_t diff = ms - prev_ms;
-                    uint32_t bpm  = ms_to_bpm(diff);
-                    clock_man_bpm = bpm;
+                    uint32_t new_bpm  = ms_to_bpm(diff);
+                    bpm = new_bpm;
     // #ifdef DEBUG
     //                 hw.seed.PrintLine("msec=%d, diff=%d, BPM=%d", ms, diff, bpm);
     // #endif

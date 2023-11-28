@@ -63,8 +63,8 @@ int main(void)
 
 
     // // ** Initialize logger */
-	hardware_manager->hw->StartLog(true);
-    hardware_manager->hw->PrintLine("DAISY ONLINE");
+	// hardware_manager->hw->StartLog(true);
+    // hardware_manager->hw->PrintLine("DAISY ONLINE");
 
     // ** Init Managers */
     clock_manager = std::make_unique<ClockManager> (&hardware_clock, hardware_manager.get());
