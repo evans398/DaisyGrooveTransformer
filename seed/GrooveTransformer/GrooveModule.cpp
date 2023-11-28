@@ -16,11 +16,6 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
 {
 	for(size_t i = 0; i < size; i++)
     {
-        // if (clock_manager->metro->Process() && clock_manager->play_enabled) {
-        //     // clock_manager->ClockOut();
-        //     playback_manager->TriggerOutputs();
-        //     clock_manager->AdvanceClockIndex();
-        // }
         ui_components_manager->PlayReadAndSetState();
         clock_manager->ObservePlayState();
     }
@@ -31,8 +26,10 @@ void sendClockPulse(){
     // TODO ties this with main clock start/stop
     if (clock_manager->play_enabled) {
         hardware_manager->clock_out.Write(clock_high);
-        // clock_manager->ClockOut();
         uart_midi_manager->SendMidiClock(clock_high);
+        clock_manager->AdvanceClockIndex();
+        // TODO: This needs to be implemented on this clock. at the moment it crashed the program
+        // playback_manager->TriggerOutputs();
         clock_high = !clock_high;
     }
     // if (clock_manager->play_enabled) {

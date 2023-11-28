@@ -151,7 +151,6 @@ struct PlaybackManager {
 
     }
     
-
     void  TriggerOutputs() {
         for (int voice_idx=0; voice_idx<NUM_OUTPUT_VOICES; voice_idx++) {
             switch(output_buffer_manager->active_output_buffer) { // only trigger from the active buffer

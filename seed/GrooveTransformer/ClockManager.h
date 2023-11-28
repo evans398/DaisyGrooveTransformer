@@ -58,22 +58,6 @@ struct ClockManager {
         }
     }
 
-    void ClockOut() {
-        if(clock_out_tick_count == 0) {
-            hardware_manager->clock_out.Write(true);
-            clock_out_tick_count++;
-        }
-        else if(clock_out_tick_count == 1) {
-            hardware_manager->clock_out.Write(false);  
-            clock_out_tick_count++;    
-        }
-        else if(clock_out_tick_count == 95) {
-            clock_out_tick_count = 0;
-        } else {
-            clock_out_tick_count++;
-        }
-    }
-
     std::pair<int, int> GetCurrentStepIndexAndOffsetTicks() {
         std::pair<int, int> pair_current_step_index_and_offset_ticks;
 
