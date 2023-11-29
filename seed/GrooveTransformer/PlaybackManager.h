@@ -152,44 +152,46 @@ struct PlaybackManager {
     }
     
     void  TriggerOutputs() {
-        for (int voice_idx=0; voice_idx<NUM_OUTPUT_VOICES; voice_idx++) {
-            switch(output_buffer_manager->active_output_buffer) { // only trigger from the active buffer
-                case OutputBuffer::OUTPUT_BUFFER_1:
-                // TODO: COLLECT ALL DAC VALUES AND SEND ONE MESSAGE PER DAC
-                {
-                    float velocity = output_buffer_manager->output_buffer_one[voice_idx]->buffer[this->clock_manager->ticks_from_start_idx];
-                    float velocity_scale_amount = 1.0;
-                    // float velocity_scale_amount = output_buffer_manager->output_buffer_one[voice_idx]->velocity_scale_amount;
-                    float scaled_velocity = velocity * velocity_scale_amount;
-                    if (scaled_velocity > 0) {
-                        int scaled_velocity_int = (int) scaled_velocity;
-                        this->uart_midi_manager->SendMidiOutputs(voice_idx, scaled_velocity_int);
-                        if (voice_idx < NUM_DAC_OUTPUT_VOICES) {
-                            // dac_output_triggers[voice_idx]->WriteTriggerToDac();
-                            // dac_output_cv[voice_idx]->WriteVelocityToDac(scaled_velocity);
-                        }
-                    }
-                }
-                case OutputBuffer::OUTPUT_BUFFER_2:
-                // TODO: COLLECT ALL DAC VALUES AND SEND ONE MESSAGE PER DAC
-                {
-                    float velocity = output_buffer_manager->output_buffer_two[voice_idx]->buffer[this->clock_manager->ticks_from_start_idx];
-                    float velocity_scale_amount = 1.0;
-                    // float velocity_scale_amount = output_buffer_manager->output_buffer_two[voice_idx]->velocity_scale_amount;
-                    float scaled_velocity = velocity * velocity_scale_amount;
-                    if (scaled_velocity > 0) {
-                        int scaled_velocity_int = (int) scaled_velocity;
-                        this->uart_midi_manager->SendMidiOutputs(voice_idx, scaled_velocity_int);
-                        if (voice_idx < NUM_DAC_OUTPUT_VOICES) {
-                            // dac_output_triggers[voice_idx]->WriteTriggerToDac();
-                            // dac_output_cv[voice_idx]->WriteVelocityToDac(scaled_velocity);
-                        }
-                    }
-                }
-                default:
-                break;
-            }
-        }
+        uart_midi_manager->SendMidiOutputs(1, 100);
+        // for (int voice_idx=0; voice_idx<NUM_OUTPUT_VOICES; voice_idx++) {
+        //     uart_midi_manager->SendMidiOutputs(1, 100);
+        //     // switch(output_buffer_manager->active_output_buffer) { // only trigger from the active buffer
+        //     //     case OutputBuffer::OUTPUT_BUFFER_1:
+        //     //     // TODO: COLLECT ALL DAC VALUES AND SEND ONE MESSAGE PER DAC
+        //     //     {
+        //     //         float velocity = output_buffer_manager->output_buffer_one[voice_idx]->buffer[this->clock_manager->ticks_from_start_idx];
+        //     //         float velocity_scale_amount = 1.0;
+        //     //         // float velocity_scale_amount = output_buffer_manager->output_buffer_one[voice_idx]->velocity_scale_amount;
+        //     //         float scaled_velocity = velocity * velocity_scale_amount;
+        //     //         if (scaled_velocity > 0) {
+        //     //             int scaled_velocity_int = (int) scaled_velocity;
+        //     //             this->uart_midi_manager->SendMidiOutputs(voice_idx, scaled_velocity_int);
+        //     //             if (voice_idx < NUM_DAC_OUTPUT_VOICES) {
+        //     //                 // dac_output_triggers[voice_idx]->WriteTriggerToDac();
+        //     //                 // dac_output_cv[voice_idx]->WriteVelocityToDac(scaled_velocity);
+        //     //             }
+        //     //         }
+        //     //     }
+        //     //     case OutputBuffer::OUTPUT_BUFFER_2:
+        //     //     // TODO: COLLECT ALL DAC VALUES AND SEND ONE MESSAGE PER DAC
+        //     //     {
+        //     //         float velocity = output_buffer_manager->output_buffer_two[voice_idx]->buffer[this->clock_manager->ticks_from_start_idx];
+        //     //         float velocity_scale_amount = 1.0;
+        //     //         // float velocity_scale_amount = output_buffer_manager->output_buffer_two[voice_idx]->velocity_scale_amount;
+        //     //         float scaled_velocity = velocity * velocity_scale_amount;
+        //     //         if (scaled_velocity > 0) {
+        //     //             int scaled_velocity_int = (int) scaled_velocity;
+        //     //             // this->uart_midi_manager->SendMidiOutputs(voice_idx, scaled_velocity_int);
+        //     //             if (voice_idx < NUM_DAC_OUTPUT_VOICES) {
+        //     //                 // dac_output_triggers[voice_idx]->WriteTriggerToDac();
+        //     //                 // dac_output_cv[voice_idx]->WriteVelocityToDac(scaled_velocity);
+        //     //             }
+        //     //         }
+        //     //     }
+        //     //     default:
+        //     //     break;
+        //     // }
+        // }
     }
 };
 

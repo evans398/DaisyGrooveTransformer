@@ -216,13 +216,13 @@ struct UartMidiManager {
     }
 
     void SendMidiPlayStop(bool play_enabled) {
-        if (play_enabled) {
-            uint8_t data[1] = { 0xFA };
-            uart_midi->SendMessage(data, 1);
-        } else {
-            uint8_t data[1] = { 0xFC };
-            uart_midi->SendMessage(data, 1);
-        }     
+        // if (play_enabled) {
+        //     uint8_t data[1] = { 0xFA };
+        //     uart_midi->SendMessage(data, 1);
+        // } else {
+        //     uint8_t data[1] = { 0xFC };
+        //     uart_midi->SendMessage(data, 1);
+        // }     
     }
 
     void SendMidiOutputs(int voice_idx, int velocity_int) {
@@ -270,30 +270,30 @@ struct UartMidiManager {
         uart_midi->SendMessage(data, 3);
 
         //** NOTE ON GENERAL MIDI MAPPING*//
-        data[0] = (general_channel_idx & 0x0F) + 0x90;  // limit channel byte, add status byte
-        uart_midi->SendMessage(data, 3);  
+        // data[0] = (general_channel_idx & 0x0F) + 0x90;  // limit channel byte, add status byte
+        // uart_midi->SendMessage(data, 3);  
 
-         // TODO MAYBE NEED TO SEPARATE CC TO ITS OWN LIKE WE DO FOR NOTE ON OFF
-        data_cc[0] = (general_channel_idx & 0x0F) + 0xB0;  // limit channel byte, add status byte
-        data_cc[1] = part_level_cc & 0x7F;
-        data_cc[2] = velocity & 0x7F;
-        uart_midi->SendMessage(data_cc, 3);
-
-        // // TODO MAYBE NEED TO SEPARATE CC TO ITS OWN LIKE WE DO FOR NOTE ON OFF
+        //  // TODO MAYBE NEED TO SEPARATE CC TO ITS OWN LIKE WE DO FOR NOTE ON OFF
         // data_cc[0] = (general_channel_idx & 0x0F) + 0xB0;  // limit channel byte, add status byte
-        // data_cc[1] = 0xB0;              // CC
-        // data_cc[2] = part_level_cc & 0x7F;
-        // data_cc[3] = velocity & 0x7F;
-        // uart_midi->SendMessage(data_cc, 4);
+        // data_cc[1] = part_level_cc & 0x7F;
+        // data_cc[2] = velocity & 0x7F;
+        // uart_midi->SendMessage(data_cc, 3);
 
-        //** NOTE OFF*//
+        // // // TODO MAYBE NEED TO SEPARATE CC TO ITS OWN LIKE WE DO FOR NOTE ON OFF
+        // // data_cc[0] = (general_channel_idx & 0x0F) + 0xB0;  // limit channel byte, add status byte
+        // // data_cc[1] = 0xB0;              // CC
+        // // data_cc[2] = part_level_cc & 0x7F;
+        // // data_cc[3] = velocity & 0x7F;
+        // // uart_midi->SendMessage(data_cc, 4);
+
+        // //** NOTE OFF*//
         data[0] = (channel & 0x0F) + 0x80;  // limit channel byte, add status byte
         data[2] = velocity_off & 0x7F;
         uart_midi->SendMessage(data, 3);
 
         //** NOTE OFF GENERAL MIDI MAPPING*//
-        data[0] = (general_channel_idx & 0x0F) + 0x80;  // limit channel byte, add status byte
-        data[2] = velocity_off & 0x7F;
-        uart_midi->SendMessage(data, 3);
+        // data[0] = (general_channel_idx & 0x0F) + 0x80;  // limit channel byte, add status byte
+        // data[2] = velocity_off & 0x7F;
+        // uart_midi->SendMessage(data, 3);
     }
 };

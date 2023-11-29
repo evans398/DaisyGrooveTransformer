@@ -5,6 +5,7 @@ TimerHandle         hardware_clock;
 TimerHandle::Config hardware_clock_cfg;
 const float         hardware_clock_freq_hz = 200000000; // can be confirmed with hardware_clock.GetFreq()
 bool clock_high = true;
+int c_count = 0;
 
 MidiUartHandler uart_midi;
 UartHandler uart_libre;
@@ -16,8 +17,9 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
 {
 	for(size_t i = 0; i < size; i++)
     {
-        ui_components_manager->PlayReadAndSetState();
         clock_manager->ObservePlayState();
+        ui_components_manager->PlayReadAndSetState();
+
     }
 }
 
@@ -29,11 +31,16 @@ void sendClockPulse(){
         uart_midi_manager->SendMidiClock(clock_high);
         clock_manager->AdvanceClockIndex();
         // TODO: This needs to be implemented on this clock. at the moment it crashed the program
-        // playback_manager->TriggerOutputs();
+        
+        if(c_count % 48 == 0) {
+            // playback_manager->TriggerOutputs();
+            uart_midi_manager->SendMidiOutputs(1, 100);
+            c_count = 0;
+        } else {
+            c_count++;
+        }
         clock_high = !clock_high;
     }
-    // if (clock_manager->play_enabled) {
-    // }
 }
 
 void ClockTimerCallback(void* data){ sendClockPulse(); }  
@@ -66,7 +73,6 @@ int main(void)
 
     // ** Init Managers */
     clock_manager = std::make_unique<ClockManager> (&hardware_clock, hardware_manager.get());
-    // hardware_clock = std::make_unique<HardwareClock> (hardware_manager.get());
     output_buffer_manager = std::make_unique<OutputBufferManager> (hardware_manager.get());
     uart_libre_manager = std::make_unique<UartLibreManager> (&uart_libre, output_buffer_manager.get(), hardware_manager.get());
     input_buffer_manager = std::make_unique<InputBufferManager> (uart_libre_manager.get(), clock_manager.get(), hardware_manager.get());
