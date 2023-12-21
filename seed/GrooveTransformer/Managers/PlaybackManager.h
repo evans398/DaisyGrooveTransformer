@@ -1,13 +1,5 @@
 #pragma once
-
 using namespace daisy;
-
-enum DAC_CHANNEL {
-    A=0,
-    B,
-    C,
-    D
-};
 
 int MAX_DAC_VALUE = 4095;
 float MAX_VELOCITY_VALUE = 127.f;

@@ -1,3 +1,4 @@
+#include "../GlobalHelpers/GlobalParameters.h"
 #pragma once
 
 struct InputBufferManager {

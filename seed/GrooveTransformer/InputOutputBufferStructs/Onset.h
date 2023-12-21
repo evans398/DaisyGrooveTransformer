@@ -1,3 +1,4 @@
+#include "../Managers/ClockManager.h"
 #pragma once
 
 struct Onset {

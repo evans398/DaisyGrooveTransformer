@@ -2,16 +2,15 @@
 #include "daisysp.h"
 #include <memory>
 
-#include "HardwareManager.h"
-#include "ClockManager.h"
-#include "OutputBufferManager.h"
-#include "Onset.h"
-#include "UartLibreManager.h"
-#include "InputBufferManager.h"
-#include "UartMidiManager.h"
-#include "UIComponentsManager.h"
-#include "PlaybackManager.h"
-
+#include "Managers/HardwareManager.h"
+#include "Managers/ClockManager.h"
+#include "Managers/OutputBufferManager.h"
+#include "InputOutputBufferStructs/Onset.h"
+#include "Managers/UartLibreManager.h"
+#include "Managers/InputBufferManager.h"
+#include "Managers/UartMidiManager.h"
+#include "Managers/UIComponentsManager.h"
+#include "Managers/PlaybackManager.h"
 
 bool LIBRE_IS_READY = false;
 

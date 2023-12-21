@@ -1,5 +1,23 @@
+#include "../UIComponents/VoiceDensityPot.h"
+#include "../GlobalHelpers/Enums.h"
 #pragma once
-#include "UIComponents.h"
+#include "../UIComponents/VoiceVelocityScalePot.h"
+#include "../UIComponents/InputGrooveVelocityPot.h"
+#include "../UIComponents/InputGrooveOffsetPot.h"
+#include "../UIComponents/TempoPot.h"
+#include "../UIComponents/InterpolationPot.h"
+#include "../UIComponents/ShiftButton.h"
+#include "../UIComponents/InterpolationButton.h"
+#include "../UIComponents/PresetPot.h"
+#include "../UIComponents/SaveButton.h"
+#include "../UIComponents/ClearButton.h"
+#include "../UIComponents/GPCV.h"
+#include "../UIComponents/GeneralPurposeParameterPot.h"
+#include "../UIComponents/GrooveGate.h"
+#include "../UIComponents/GrooveCV.h"
+#include "../UIComponents/CVClockInput.h"
+#include "../UIComponents/RecordOverdubSwitch.h"
+#include "../UIComponents/PlayStopSwitch.h"
 
 struct UIComponentsManager {
     HardwareManager* hardware_manager;

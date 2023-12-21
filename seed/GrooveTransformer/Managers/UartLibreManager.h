@@ -1,28 +1,7 @@
 #pragma once
-
 using namespace daisy;
 
-// bool LIBRE_IS_READY = false;
-
-enum class ModelParameter {
-    VOICE_DENSITY, 
-    INPUT_GROOVE_VELOCITY,
-    INPUT_GROOVE_OFFSET,
-    UNCERTAINTY,
-    INTERPOLATION_SAVE_A,
-    INTERPOLATION_SAVE_B,
-    INTERPOLATION_RANDOM_A,
-    INTERPOLATION_RANDOM_B,
-    INTERPOLATION_POSITION,
-    LOAD_PRESET,
-    SAVE_PRESET,
-    GENERAL_PURPOSE,
-    FREE_RECORDING,
-    OVERDUB_RECORDING,
-    RESET_GROOVE
-};
-
-/** UART Communication */
+// /** UART Communication Buffer */
 #define LIBRE_BUFF_SIZE 4096
 static uint8_t DMA_BUFFER_MEM_SECTION tx_buff[LIBRE_BUFF_SIZE]; // buffer to be dma transmitted
 
@@ -30,10 +9,12 @@ struct UartLibreManager {
     //** Handlers */
     UartHandler* uart_libre;
     HardwareManager* hardware_manager;
+    OutputBufferManager* output_buffer_manager;
+    
     bool SEND_ALL_UI_PARAMS = true;
     bool SEND_ALL_ONSETS = true;
 
-    OutputBufferManager* output_buffer_manager;
+    // bool LIBRE_IS_READY = false;
 
     //** UART Communication FIFO Rx Strings */
     std::string fifo_char_string;

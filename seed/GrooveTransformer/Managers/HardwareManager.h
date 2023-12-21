@@ -1,66 +1,7 @@
+#include "../GlobalHelpers/Enums.h"
 #pragma once
 
 using namespace daisy;
-
-enum AdcChannel {
-   MUX_1 = 0,
-   MUX_2,
-   MUX_3,
-   GROOVE_TRIGGER_IN,
-   GROOVE_VELOCITY_IN,
-   CLOCK_IN,
-   PRESET_KNOB,
-   NUM_ADC_CHANNELS
-};
-
-enum Mux_0_Index {
-   VOICE_DENSITY_POT_0 = 0,
-   VOICE_DENSITY_POT_1,
-   VOICE_DENSITY_POT_2,
-   VOICE_DENSITY_POT_3,
-   VOICE_DENSITY_POT_4,
-   VOICE_DENSITY_POT_5,
-   INPUT_GROOVE_VEL_POT,
-   INPUT_GROOVE_OFF_POT
-};
-
-enum Mux_1_Index {
-   VOICE_SCALE_POT_0 = 0,
-   VOICE_SCALE_POT_1,
-   VOICE_SCALE_POT_2,
-   VOICE_SCALE_POT_3,
-   VOICE_SCALE_POT_4,
-   VOICE_SCALE_POT_5,
-   UNCERTAINTY_POT,
-   TEMPO_POT
-};
-
-enum Mux_2_Index {
-    GP_POT_1 = 0,
-    GP_POT_2,
-    GP_POT_3,
-    INTERPOLATION_POT,
-    GP_CV_1,
-    GP_CV_2,
-    GP_CV_3,
-    UNCERTAINTY_CV
-};
-
-enum Switch_Daisy_Pin_Index {
-    SAVE_BUTTON = 5,
-    SHIFT_BUTTON = 6,
-    CLEAR_BUTTON = 7,
-    ON_OFF_SWITCH = 8,
-    RECORD_SWITCH = 9,
-    OVERDUB_SWITCH = 10,
-    A_BUTTON = 29,
-    B_BUTTON = 3
-};
-
-Pin clock_out_pin = seed::D23;
-Pin a_led_pin = seed::D30;
-Pin b_led_pin = seed::D4;
-Pin shift_led_pin = seed::D26;
 
 struct HardwareManager {
     DaisySeed* hw;
@@ -81,6 +22,10 @@ struct HardwareManager {
     GPIO b_led;
     GPIO save_led;
 
+    Pin clock_out_pin = seed::D23;
+    Pin a_led_pin = seed::D30;
+    Pin b_led_pin = seed::D4;
+    Pin shift_led_pin = seed::D26;
 
     HardwareManager(
         DaisySeed* hw,

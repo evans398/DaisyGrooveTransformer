@@ -3,7 +3,6 @@ using namespace daisy;
 
 TimerHandle         hardware_clock;
 TimerHandle::Config hardware_clock_cfg;
-const float         hardware_clock_freq_hz = 200000000; // can be confirmed with hardware_clock.GetFreq()
 bool clock_high = true;
 int c_count = 0;
 
@@ -11,7 +10,6 @@ MidiUartHandler uart_midi;
 UartHandler uart_libre;
 DaisySeed hw;
 I2CHandle i2c;
-Metro metro;
 
 void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, size_t size)
 {
@@ -90,10 +88,7 @@ int main(void)
     hardware_clock_cfg.periph     = TimerHandle::Config::Peripheral::TIM_5;
     hardware_clock_cfg.dir        = TimerHandle::Config::CounterDir::UP;
     hardware_clock_cfg.enable_irq = true;
-    float bpm                   = 120.0f;
-    float ppqn                  = 24.0f;
-    float period_freq_hz = ppqn * bpm * (1.0f/60.0f) * 2;
-    float period                = hardware_clock_freq_hz/period_freq_hz;
+    float period                  = internal_clock_freq_hz/clock_period_freq_hz;
     hardware_clock_cfg.period     = static_cast<uint32_t>(period);
     hardware_clock.Init(hardware_clock_cfg);
     hardware_clock.SetCallback(ClockTimerCallback);
