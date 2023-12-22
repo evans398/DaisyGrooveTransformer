@@ -27,12 +27,11 @@ void sendClockPulse(){
     if (clock_manager->play_enabled) {
         hardware_manager->clock_out.Write(clock_high);
         uart_midi_manager->SendMidiClock(clock_high);
+        playback_manager->TriggerOutputs();
         clock_manager->AdvanceClockIndex();
         // TODO: This needs to be implemented on this clock. at the moment it crashed the program
         
         if(c_count % 48 == 0) {
-            // playback_manager->TriggerOutputs();
-            uart_midi_manager->SendMidiOutputs(1, 100);
             c_count = 0;
         } else {
             c_count++;
@@ -84,6 +83,13 @@ int main(void)
         hardware_manager.get()
     );
 
+    playback_manager = std::make_unique<PlaybackManager>(
+        uart_midi_manager.get(), 
+        clock_manager.get(), 
+        output_buffer_manager.get(), 
+        hardware_manager.get()
+    );
+
     // ** Set up hardware_clock for external syncing */
     hardware_clock_cfg.periph     = TimerHandle::Config::Peripheral::TIM_5;
     hardware_clock_cfg.dir        = TimerHandle::Config::CounterDir::UP;
@@ -92,7 +98,6 @@ int main(void)
     hardware_clock_cfg.period     = static_cast<uint32_t>(period);
     hardware_clock.Init(hardware_clock_cfg);
     hardware_clock.SetCallback(ClockTimerCallback);
-    hardware_clock.Start();
     
     ui_components_manager = std::make_unique<UIComponentsManager> (
         hardware_manager.get(),
@@ -102,13 +107,8 @@ int main(void)
         clock_manager.get(),
         uart_midi_manager.get()
     );
-    
-    playback_manager = std::make_unique<PlaybackManager>(
-        uart_midi_manager.get(), 
-        clock_manager.get(), 
-        output_buffer_manager.get(), 
-        hardware_manager.get()
-    );
+
+    hardware_clock.Start();
 
     //** Initialize Audio Callback */
 	hardware_manager->hw->SetAudioBlockSize(4); // number of samples handled per callback
@@ -116,29 +116,29 @@ int main(void)
     // ** Start Audio Callback */
 	hardware_manager->hw->StartAudio(AudioCallback);
 
-    // std::string ng_string = "NG/";
-    // std::string gd_string = "GD/";
-    // uart_libre_manager->TestHandleLibreFifoMessage(ng_string);
-    // for (int idx = 0; idx<3; idx++) {
-    //     std::string voice_idx = std::to_string(idx);
-    //     std::string hit_string_2 = "H/" + voice_idx + "/7/12/0";
-    //     std::string hit_string_3 = "H/" + voice_idx + "/13/127/0";
-    //     std::string hit_string_4 = "H/" + voice_idx + "/19/80/0";
-    //     std::string hit_string_1 = "H/" + voice_idx + "/1/45/0";
-    //     std::string hit_string_5 = "H/" + voice_idx + "/20/90/0";
-    //     std::string hit_string_6 = "H/" + voice_idx + "/21/10/0";
-    //     std::string hit_string_7 = "H/" + voice_idx + "/28/127/0";
-    //     std::string hit_string_8 = "H/" + voice_idx + "/29/110/0";
-    //     uart_libre_manager->TestHandleLibreFifoMessage(hit_string_1);
-    //     uart_libre_manager->TestHandleLibreFifoMessage(hit_string_2);
-    //     uart_libre_manager->TestHandleLibreFifoMessage(hit_string_3);
-    //     uart_libre_manager->TestHandleLibreFifoMessage(hit_string_4);
-    //     uart_libre_manager->TestHandleLibreFifoMessage(hit_string_5);
-    //     uart_libre_manager->TestHandleLibreFifoMessage(hit_string_6);
-    //     uart_libre_manager->TestHandleLibreFifoMessage(hit_string_7);
-    //     uart_libre_manager->TestHandleLibreFifoMessage(hit_string_8);
-    // }
-    // uart_libre_manager->TestHandleLibreFifoMessage(gd_string);
+    std::string ng_string = "NG/";
+    std::string gd_string = "GD/";
+    uart_libre_manager->TestHandleLibreFifoMessage(ng_string);
+    for (int idx = 0; idx<3; idx++) {
+        std::string voice_idx = std::to_string(idx);
+        std::string hit_string_2 = "H/" + voice_idx + "/7/12/0";
+        std::string hit_string_3 = "H/" + voice_idx + "/13/127/0";
+        std::string hit_string_4 = "H/" + voice_idx + "/19/80/0";
+        std::string hit_string_1 = "H/" + voice_idx + "/1/45/0";
+        std::string hit_string_5 = "H/" + voice_idx + "/20/90/0";
+        std::string hit_string_6 = "H/" + voice_idx + "/21/10/0";
+        std::string hit_string_7 = "H/" + voice_idx + "/28/127/0";
+        std::string hit_string_8 = "H/" + voice_idx + "/29/110/0";
+        uart_libre_manager->TestHandleLibreFifoMessage(hit_string_1);
+        uart_libre_manager->TestHandleLibreFifoMessage(hit_string_2);
+        uart_libre_manager->TestHandleLibreFifoMessage(hit_string_3);
+        uart_libre_manager->TestHandleLibreFifoMessage(hit_string_4);
+        uart_libre_manager->TestHandleLibreFifoMessage(hit_string_5);
+        uart_libre_manager->TestHandleLibreFifoMessage(hit_string_6);
+        uart_libre_manager->TestHandleLibreFifoMessage(hit_string_7);
+        uart_libre_manager->TestHandleLibreFifoMessage(hit_string_8);
+    }
+    uart_libre_manager->TestHandleLibreFifoMessage(gd_string);
 
 
     // loop forever
