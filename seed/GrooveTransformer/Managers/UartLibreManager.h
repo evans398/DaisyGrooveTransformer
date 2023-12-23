@@ -24,23 +24,7 @@ struct UartLibreManager {
         this->uart_libre = uart_libre;
         this->output_buffer_manager = output_buffer_manager;
         this->hardware_manager = hardware_manager;
-        // InitUartLibre();
     };
-
-    void InitUartLibre() {
-        // Configure the Uart Peripheral for Pi Communication
-        UartHandler::Config uart_conf;
-        uart_conf.periph        = UartHandler::Config::Peripheral::USART_2;
-        uart_conf.mode          = UartHandler::Config::Mode::TX_RX;
-        uart_conf.pin_config.tx = Pin(PORTA, 2);
-        uart_conf.pin_config.rx = Pin(PORTA, 3);
-
-        // Initialize the uart_libre peripheral and start the DMA transmit
-        this->uart_libre->Init(uart_conf);
-
-        /** Start the FIFO Receive */
-        this->uart_libre->DmaReceiveFifo();
-    }
 
     void HandleLibreUart(){
         // ** UART Receiver */

@@ -46,6 +46,11 @@ int main(void)
 {
      // ** Init Hardware Manager */
     hardware_manager = std::make_unique<HardwareManager> (&hw, &i2c);
+
+    // // ** Initialize logger */
+	// hardware_manager->hw->StartLog(true);
+    // hardware_manager->hw->PrintLine("DAISY ONLINE");
+
     // Configure the Uart Peripheral for Pi Communication
     UartHandler::Config uart_conf;
     uart_conf.periph        = UartHandler::Config::Peripheral::USART_2;
@@ -62,11 +67,6 @@ int main(void)
 
     // /** Start the FIFO Receive */
     // uart_libre.DmaReceiveFifo();
-
-
-    // // ** Initialize logger */
-	// hardware_manager->hw->StartLog(true);
-    // hardware_manager->hw->PrintLine("DAISY ONLINE");
 
     // ** Init Managers */
     clock_manager = std::make_unique<ClockManager> (&hardware_clock, hardware_manager.get());
