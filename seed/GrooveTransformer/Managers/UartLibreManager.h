@@ -30,20 +30,21 @@ struct UartLibreManager {
         // ** UART Receiver */
         // if there's data, pop it from the FIFO
         if(this->uart_libre->ReadableFifo()){
+            // hardware_manager->hw->PrintLine("READABLE FIFO");
             this->HandleLibreFifoMessage();
         } 
     }
 
     void HandleLibreFifoMessage() {
         // receives messages one char at a time
-        hardware_manager->hw->PrintLine("HANDLING FIFO");
+        // hardware_manager->hw->PrintLine("HANDLING FIFO");
 
         uint8_t top_fifo_item = this->uart_libre->PopFifo(); // get top fifo item
 
         if (top_fifo_item != 0x0a) { // if top is not \n char, add it to the char string
             fifo_char_string += char(top_fifo_item);
         } else {
-            // hardware_manager->hw->PrintLine("Received: %s", fifo_char_string.c_str());
+            hardware_manager->hw->PrintLine("Received: %s", fifo_char_string.c_str());
             if (fifo_char_string.size() > 20) {
                 fifo_char_string.clear();
             }

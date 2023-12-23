@@ -58,20 +58,15 @@ int main(void)
     uart_conf.pin_config.tx = Pin(PORTA, 2);
     uart_conf.pin_config.rx = Pin(PORTA, 3);
 
-    MidiUartHandler::Config uart_midi_config;
-    uart_midi.Init(uart_midi_config); // Initialize the uart_libre peripheral and start the DMA transmit
-    uart_midi.StartReceive(); // Start the FIFO Receive
-    
     // Initialize the uart_libre peripheral and start the DMA transmit
     uart_libre.Init(uart_conf); 
 
-<<<<<<< Updated upstream
-    // /** Start the FIFO Receive */
-    // uart_libre.DmaReceiveFifo();
-=======
     /** Start the FIFO Receive */
     uart_libre.DmaReceiveFifo();
->>>>>>> Stashed changes
+
+    MidiUartHandler::Config uart_midi_config;
+    uart_midi.Init(uart_midi_config); // Initialize the uart_libre peripheral and start the DMA transmit
+    // uart_midi.StartReceive(); // Start the FIFO Receive
 
     // ** Init Managers */
     clock_manager = std::make_unique<ClockManager> (&hardware_clock, hardware_manager.get());
