@@ -3,6 +3,7 @@ using namespace daisy;
 
 // /** UART Communication Buffer */
 #define LIBRE_BUFF_SIZE 4096
+#define LIBRE_RX_BUFF_SIZE 128
 static uint8_t DMA_BUFFER_MEM_SECTION tx_buff[LIBRE_BUFF_SIZE]; // buffer to be dma transmitted
 
 struct UartLibreManager {
@@ -19,6 +20,7 @@ struct UartLibreManager {
     //** UART Communication FIFO Rx Strings */
     std::string fifo_char_string;
     std::string first_char;
+    uint8_t rx_buff[LIBRE_RX_BUFF_SIZE];
 
     UartLibreManager(UartHandler* uart_libre, OutputBufferManager* output_buffer_manager, HardwareManager* hardware_manager){
         this->uart_libre = uart_libre;
@@ -27,19 +29,51 @@ struct UartLibreManager {
     };
 
     void HandleLibreUart(){
-        // ** UART Receiver */
-        // if there's data, pop it from the FIFO
-        if(this->uart_libre->ReadableFifo()){
-            // hardware_manager->hw->PrintLine("READABLE FIFO");
-            this->HandleLibreFifoMessage();
-        } 
+    //     // ** UART Receiver */
+    //     // // if there's data, pop it from the FIFO
+    //     // if(this->uart_libre->ReadableFifo()){
+    //     //     // hardware_manager->hw->PrintLine("READABLE FIFO");
+    //     //     this->HandleLibreFifoMessage();
+    //     // } 
+        uart_libre->BlockingReceive(rx_buff, LIBRE_RX_BUFF_SIZE, 500);
+        HandleLibreFifoMessage();
+        // if(uart_libre->BlockingReceive(rx_buff, 128, 500) == UartHandler::Result::OK) {
+        //     hardware_manager->hw->PrintLine("BLOCKING RECEIVED");
+        //     HandleLibreFifoMessage();
+        // };
+    //     HandleLibreFifoMessage();
+    }
+
+    uint8_t PopRxBuffer() {
+        if (rx_buff[0] != '\0') {
+            uint8_t firstElement = rx_buff[0];
+            std::string top_f = std::to_string(firstElement);
+            hardware_manager->hw->PrintLine("popped off buff: %s", top_f.c_str());
+
+            // Shift the remaining elements to the left to remove the first element
+            for (size_t i = 0; i < sizeof(rx_buff) - 1; ++i) {
+                rx_buff[i] = rx_buff[i + 1];
+            }
+
+            // Set the last element to '\0' (optional)
+            rx_buff[sizeof(rx_buff) - 1] = '\0';
+
+            return firstElement;
+        } else {
+            // Handle the case where the array is empty (e.g., return a special value)
+            return 0xFF; // Modify this based on your requirements
+        }
     }
 
     void HandleLibreFifoMessage() {
         // receives messages one char at a time
         // hardware_manager->hw->PrintLine("HANDLING FIFO");
 
-        uint8_t top_fifo_item = this->uart_libre->PopFifo(); // get top fifo item
+        // uint8_t top_fifo_item = 0x0a;
+        // uint8_t top_fifo_item = this->uart_libre->PopFifo(); // get top fifo item
+        uint8_t top_fifo_item = PopRxBuffer();
+        std::string top_f = std::to_string(top_fifo_item);
+        hardware_manager->hw->PrintLine("top_fifo_item: %s", top_f.c_str());
 
         if (top_fifo_item != 0x0a) { // if top is not \n char, add it to the char string
             fifo_char_string += char(top_fifo_item);
