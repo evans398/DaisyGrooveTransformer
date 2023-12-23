@@ -98,12 +98,12 @@ struct UartMidiManager {
     {
         /** Pull the oldest one from the list... */
         int midi_type_enum_value = static_cast<int>(midi_event.type);
-        hardware_manager->hw->PrintLine("midi_event.type: %d", midi_event.type);
+        // hardware_manager->hw->PrintLine("midi_event.type: %d", midi_event.type);
         switch(midi_event.type)
         {
             case NoteOn:
             {
-                hardware_manager->hw->Print("RECEIVED MIDI NOTE");
+                // hardware_manager->hw->Print("RECEIVED MIDI NOTE");
                 // midi information
                 auto note_msg = midi_event.AsNoteOn();
                 float input_velocity = note_msg.velocity/127.f;

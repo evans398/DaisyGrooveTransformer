@@ -16,7 +16,7 @@ struct ShiftButton {
         hardware_manager->shift_button.Debounce();
         bool pressed = hardware_manager->shift_button.Pressed();
         if (!pressed && prev) {
-            hardware_manager->hw->PrintLine("SHIFT PRESSED");
+            // hardware_manager->hw->PrintLine("SHIFT PRESSED");
         }
         prev = pressed;
         return hardware_manager->shift_button.Pressed();

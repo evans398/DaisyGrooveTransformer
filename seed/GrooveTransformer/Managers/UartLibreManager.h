@@ -36,6 +36,7 @@ struct UartLibreManager {
 
     void HandleLibreFifoMessage() {
         // receives messages one char at a time
+        hardware_manager->hw->PrintLine("HANDLING FIFO");
 
         uint8_t top_fifo_item = this->uart_libre->PopFifo(); // get top fifo item
 

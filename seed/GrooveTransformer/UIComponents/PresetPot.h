@@ -39,7 +39,6 @@ struct PresetPot {
         } else if (scaled_value > preset_threshold_3) {
             preset_index = 4;
         }
-        hardware_manager->hw->PrintLine("Preset Index %d", preset_index);
         return preset_index;
     }
 };

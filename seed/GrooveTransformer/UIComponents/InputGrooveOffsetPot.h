@@ -31,7 +31,6 @@ struct InputGrooveOffsetPot {
         // int scaled_value = GetScaledValue();
         int scaled_value = 0;
         if (scaled_value != prev_scaled_value || force_transmit) {
-            // hardware_manager->hw->PrintLine("INPUT GROOVE OFFSET value: " FLT_FMT3, FLT_VAR3(scaled_value));
             // this->uart_libre_manager->TransmitUIParameterValue(ModelParameter::INPUT_GROOVE_OFFSET, scaled_value);
             this->uart_libre_manager->TransmitUIParameterValue(ModelParameter::INPUT_GROOVE_OFFSET, 0);
         }

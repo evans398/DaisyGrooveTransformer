@@ -62,11 +62,16 @@ int main(void)
     uart_midi.Init(uart_midi_config); // Initialize the uart_libre peripheral and start the DMA transmit
     uart_midi.StartReceive(); // Start the FIFO Receive
     
-    // // Initialize the uart_libre peripheral and start the DMA transmit
-    // uart_libre.Init(uart_conf); 
+    // Initialize the uart_libre peripheral and start the DMA transmit
+    uart_libre.Init(uart_conf); 
 
+<<<<<<< Updated upstream
     // /** Start the FIFO Receive */
     // uart_libre.DmaReceiveFifo();
+=======
+    /** Start the FIFO Receive */
+    uart_libre.DmaReceiveFifo();
+>>>>>>> Stashed changes
 
     // ** Init Managers */
     clock_manager = std::make_unique<ClockManager> (&hardware_clock, hardware_manager.get());
@@ -116,6 +121,10 @@ int main(void)
     // ** Start Audio Callback */
 	hardware_manager->hw->StartAudio(AudioCallback);
 
+    // ** Initialize logger */
+	hardware_manager->hw->StartLog(true);
+    hardware_manager->hw->PrintLine("DAISY ONLINE");
+
     std::string ng_string = "NG/";
     std::string gd_string = "GD/";
     uart_libre_manager->TestHandleLibreFifoMessage(ng_string);
@@ -148,7 +157,7 @@ int main(void)
             ui_components_manager->ReadUIComponents();
         }
 
-        // uart_libre_manager->HandleLibreUart();
+        uart_libre_manager->HandleLibreUart();
         ui_components_manager->ObserveSAPMessage();
         input_buffer_manager->ObserveSAPMessage();
         input_buffer_manager->ObserveRecordBuffer(); //This must be called before Midi is Handled

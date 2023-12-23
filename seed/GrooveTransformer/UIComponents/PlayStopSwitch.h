@@ -29,13 +29,11 @@ struct PlayStopSwitch {
     void ReadAndSetState() {
         hardware_manager->play_stop_switch.Debounce();
         if (hardware_manager->play_stop_switch.Pressed() && !play_enabled) {
-            // hardware_manager->hw->PrintLine("PLAY ENABLED");
             uart_midi_manager->SendMidiPlayStop(play_enabled);
             play_enabled = hardware_manager->play_stop_switch.Pressed();
             clock_manager->play_enabled = hardware_manager->play_stop_switch.Pressed();
         }
         if (!hardware_manager->play_stop_switch.Pressed() && play_enabled) {
-            // hardware_manager->hw->PrintLine("PLAY DISABLED");
             play_enabled = hardware_manager->play_stop_switch.Pressed();
             clock_manager->play_enabled = hardware_manager->play_stop_switch.Pressed();
             uart_midi_manager->SendMidiPlayStop(play_enabled);

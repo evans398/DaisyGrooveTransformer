@@ -21,7 +21,6 @@ struct ClearButton {
     void TransmitNewValue(){
         hardware_manager->clear_button.Debounce();
         if (hardware_manager->clear_button.Pressed() && !prev_state_pressed) {
-            hardware_manager->hw->PrintLine("CLEAR BUTTON PRESSED");
             uart_libre_manager->TransmitUIParameterState(ModelParameter::RESET_GROOVE);
             input_buffer_manager->ClearBuffer();
         }

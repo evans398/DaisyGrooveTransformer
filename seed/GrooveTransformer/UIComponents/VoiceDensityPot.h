@@ -38,8 +38,6 @@ struct VoiceDensityPot {
     void TransmitNewValue(bool force_transmit){
         int scaled_value = GetScaledValue();
         if (scaled_value != prev_scaled_value || force_transmit) {
-            hardware_manager->hw->Print("VOICE DENSITY POT %d ", voice_idx);
-            hardware_manager->hw->PrintLine("value: %d", scaled_value);
             int voice_number = voice_idx + 1;
             uart_libre_manager->TransmitUIIndexedParameterValue(ModelParameter::VOICE_DENSITY, voice_number, scaled_value);
         }

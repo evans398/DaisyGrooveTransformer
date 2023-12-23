@@ -37,8 +37,6 @@ struct VoiceVelocityScalePot {
     void ReadScaleVoiceVelocityPot() {
         int scaled_value = GetScaledValue();
         if (scaled_value != prev_scaled_value) {
-            hardware_manager->hw->Print("VOICE VEL POT %d ", voice_idx);
-            hardware_manager->hw->PrintLine("value: " FLT_FMT3, FLT_VAR3(scaled_value));
             this->output_buffer_manager->UpdateVoiceVelocityScale(this->voice_idx, scaled_value);
         }
         this->prev_scaled_value = scaled_value;

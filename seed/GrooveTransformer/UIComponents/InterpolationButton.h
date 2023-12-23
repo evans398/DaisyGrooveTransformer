@@ -25,12 +25,10 @@ struct InterpolationButton {
             this->hardware_manager->interpolation_button_a.Debounce();
             hardware_manager->shift_button.Debounce();
             if (this->hardware_manager->interpolation_button_a.Pressed() && !this->prev_state_pressed && !this->hardware_manager->shift_button.Pressed()) {
-                hardware_manager->hw->PrintLine("INTERP A SAVED");
                 this->uart_libre_manager->TransmitUIParameterState(ModelParameter::INTERPOLATION_SAVE_A);
                 hardware_manager->BlinkLed(&hardware_manager->b_led, false);
             }
             if (this->hardware_manager->interpolation_button_a.Pressed() && !this->prev_state_pressed && this->hardware_manager->shift_button.Pressed()) {
-                hardware_manager->hw->PrintLine("INTERP A RANDOM");
                 this->uart_libre_manager->TransmitUIParameterState(ModelParameter::INTERPOLATION_RANDOM_A);
                 hardware_manager->BlinkLed(&hardware_manager->b_led, true);
             }       
@@ -39,12 +37,10 @@ struct InterpolationButton {
         if(interpolation_button_name == InterpolationButtonName::BUTTON_B) {
             this->hardware_manager->interpolation_button_b.Debounce();
             if (this->hardware_manager->interpolation_button_b.Pressed() && !this->prev_state_pressed && !this->hardware_manager->shift_button.Pressed()) {
-                hardware_manager->hw->PrintLine("INTERP B SAVED");
                 this->uart_libre_manager->TransmitUIParameterState(ModelParameter::INTERPOLATION_SAVE_B);
                 hardware_manager->BlinkLed(&hardware_manager->b_led, false);
             }
             if (this->hardware_manager->interpolation_button_b.Pressed() && !this->prev_state_pressed && this->hardware_manager->shift_button.Pressed()) {
-                hardware_manager->hw->PrintLine("INTERP B RANDOM");
                 this->uart_libre_manager->TransmitUIParameterState(ModelParameter::INTERPOLATION_RANDOM_B);
                 hardware_manager->BlinkLed(&hardware_manager->b_led, true);
             }       

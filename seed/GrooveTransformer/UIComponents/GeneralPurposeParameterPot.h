@@ -55,12 +55,9 @@ struct GeneralPurposeParameterPot {
         if (combined_value != prev_scaled_value || force_transmit) {
             switch(this->model_parameter) {
                 case ModelParameter::GENERAL_PURPOSE:
-                    hardware_manager->hw->Print("GEN PURP %d", general_purpose_pot_index);
-                    hardware_manager->hw->PrintLine(" value: " FLT_FMT3, FLT_VAR3(combined_value));
                     this->uart_libre_manager->TransmitUIIndexedParameterValue(this->model_parameter, this->general_purpose_pot_index+1, combined_value);
                     break;
                 case ModelParameter::UNCERTAINTY:
-                    hardware_manager->hw->PrintLine("UNCERTAINTY VALUE: " FLT_FMT3, FLT_VAR3(combined_value));
                     this->uart_libre_manager->TransmitUIParameterValue(ModelParameter::UNCERTAINTY, combined_value);
                     break;
                 default:

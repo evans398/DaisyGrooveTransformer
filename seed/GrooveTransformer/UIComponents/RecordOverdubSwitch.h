@@ -26,19 +26,16 @@ struct RecordOverdubSwitch {
         hardware_manager->overdub_switch.Debounce();
 
         if ((overdub_enabled || rec_enabled) && !hardware_manager->record_switch.Pressed() && !hardware_manager->overdub_switch.Pressed()) {
-            hardware_manager->hw->PrintLine("REC/OVR OFF");
             input_buffer_manager->rec_enabled = false;
             input_buffer_manager->overdub_enabled = false;
         }
 
         if (hardware_manager->record_switch.Pressed() && !rec_enabled) {
-            hardware_manager->hw->PrintLine("REC ENABLED");
             input_buffer_manager->rec_enabled =true;
             input_buffer_manager->overdub_enabled = false;
         }
 
         if (hardware_manager->overdub_switch.Pressed() && !overdub_enabled) {
-            hardware_manager->hw->PrintLine("OverDUB ENABLED");
             input_buffer_manager->rec_enabled = false;
             input_buffer_manager->overdub_enabled = true;
         }

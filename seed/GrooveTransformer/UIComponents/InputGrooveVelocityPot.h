@@ -29,7 +29,6 @@ struct InputGrooveVelocityPot {
     void TransmitNewValue(bool force_transmit){
         int scaled_value = GetScaledValue();
         if (scaled_value != prev_scaled_value || force_transmit) {
-            hardware_manager->hw->PrintLine("INPUT GROOVE VEL value: " FLT_FMT3, FLT_VAR3(scaled_value));
             this->uart_libre_manager->TransmitUIParameterValue(ModelParameter::INPUT_GROOVE_VELOCITY, scaled_value);
         }
         this->prev_scaled_value = scaled_value;
