@@ -25,7 +25,7 @@ struct UIComponentsManager {
     InputBufferManager* input_buffer_manager;
     OutputBufferManager* output_buffer_manager;
     ClockManager* clock_manager;
-    UartMidiManager* uart_midi_manager;
+    MidiManager* uart_midi_manager;
 
     std::array<std::unique_ptr<VoiceDensityPot>, NUM_OUTPUT_VOICES> voice_density_pots;
     std::array<std::unique_ptr<VoiceVelocityScalePot>, NUM_OUTPUT_VOICES> voice_velocity_scale_pots;
@@ -60,7 +60,7 @@ struct UIComponentsManager {
         InputBufferManager* input_buffer_manager,
         OutputBufferManager* output_buffer_manager,
         ClockManager* clock_manager,
-        UartMidiManager* uart_midi_manager
+        MidiManager* uart_midi_manager
     ) {
         //** Managers */
         this->hardware_manager = hardware_manager;

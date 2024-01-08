@@ -78,7 +78,7 @@ struct DacOutput {
 };
 
 struct PlaybackManager {
-    UartMidiManager* uart_midi_manager;
+    MidiManager* uart_midi_manager;
     ClockManager* clock_manager;
     OutputBufferManager* output_buffer_manager;
     HardwareManager* hardware_manager;
@@ -87,7 +87,7 @@ struct PlaybackManager {
     std::array<std::unique_ptr<DacOutput>, NUM_DAC_OUTPUT_VOICES> dac_output_cv;
 
     PlaybackManager(
-        UartMidiManager* uart_midi_manager, 
+        MidiManager* uart_midi_manager, 
         ClockManager* clock_manager,
         OutputBufferManager* output_buffer_manager,
         HardwareManager* hardware_manager

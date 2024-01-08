@@ -1,17 +1,17 @@
 #pragma once
 #include "../Managers/HardwareManager.h"
 #include "../Managers/ClockManager.h"
-#include "../Managers/UartMidiManager.h"
+#include "../Managers/MidiManager.h"
 #include "UIComponentHelper.h"
 
 struct PlayStopSwitch {
     HardwareManager* hardware_manager;
     ClockManager* clock_manager;
-    UartMidiManager* uart_midi_manager;
+    MidiManager* uart_midi_manager;
     bool play_enabled;
 
 
-    PlayStopSwitch(HardwareManager* hardware_manager, ClockManager* clock_manager, UartMidiManager* uart_midi_manager) {
+    PlayStopSwitch(HardwareManager* hardware_manager, ClockManager* clock_manager, MidiManager* uart_midi_manager) {
         this->hardware_manager =  hardware_manager;
         this->clock_manager = clock_manager;
         this->uart_midi_manager = uart_midi_manager;

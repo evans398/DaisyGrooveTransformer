@@ -8,7 +8,7 @@
 #include "InputOutputBufferStructs/Onset.h"
 #include "Managers/UartLibreManager.h"
 #include "Managers/InputBufferManager.h"
-#include "Managers/UartMidiManager.h"
+#include "Managers/MidiManager.h"
 #include "Managers/UIComponentsManager.h"
 #include "Managers/PlaybackManager.h"
 
@@ -20,5 +20,5 @@ std::unique_ptr<OutputBufferManager> output_buffer_manager;
 std::unique_ptr<UartLibreManager> uart_libre_manager;
 std::unique_ptr<InputBufferManager> input_buffer_manager;
 std::unique_ptr<UIComponentsManager> ui_components_manager;
-std::unique_ptr<UartMidiManager> uart_midi_manager;
+std::unique_ptr<MidiManager> uart_midi_manager;
 std::unique_ptr<PlaybackManager> playback_manager;

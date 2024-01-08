@@ -79,7 +79,7 @@ int main(void)
     uart_libre_manager = std::make_unique<UartLibreManager> (&uart_libre, output_buffer_manager.get(), hardware_manager.get());
     input_buffer_manager = std::make_unique<InputBufferManager> (uart_libre_manager.get(), clock_manager.get(), hardware_manager.get());
     
-    uart_midi_manager = std::make_unique<UartMidiManager> (
+    uart_midi_manager = std::make_unique<MidiManager> (
         &usb_midi,
         &uart_midi,
         output_buffer_manager.get(), 
