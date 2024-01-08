@@ -6,6 +6,7 @@ TimerHandle::Config hardware_clock_cfg;
 bool clock_high = true;
 int c_count = 0;
 
+MidiUsbHandler usb_midi;
 MidiUartHandler uart_midi;
 UartHandler uart_libre;
 DaisySeed hw;
@@ -64,6 +65,10 @@ int main(void)
     /** Start the FIFO Receive */
     uart_libre.DmaReceiveFifo();
 
+    MidiUsbHandler::Config usb_midi_cfg;
+    usb_midi_cfg.transport_config.periph = MidiUsbTransport::Config::INTERNAL;
+    usb_midi.Init(usb_midi_cfg);
+
     MidiUartHandler::Config uart_midi_config;
     uart_midi.Init(uart_midi_config); // Initialize the uart_libre peripheral and start the DMA transmit
     // uart_midi.StartReceive(); // Start the FIFO Receive
@@ -75,6 +80,7 @@ int main(void)
     input_buffer_manager = std::make_unique<InputBufferManager> (uart_libre_manager.get(), clock_manager.get(), hardware_manager.get());
     
     uart_midi_manager = std::make_unique<UartMidiManager> (
+        &usb_midi,
         &uart_midi,
         output_buffer_manager.get(), 
         input_buffer_manager.get(), 

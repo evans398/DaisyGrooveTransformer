@@ -1,10 +1,8 @@
 #include "../GlobalHelpers/GlobalParameters.h"
 #pragma once
 
-struct UartMidiManager {
+struct MidiManager {
     MidiUsbHandler* usb_midi;
-    MidiUartHandler* uart_midi;
-    
     OutputBufferManager* output_buffer_manager;
     InputBufferManager* input_buffer_manager;
     UartLibreManager* uart_libre_manager;
@@ -22,16 +20,14 @@ struct UartMidiManager {
     bool is_onset                = true; // flag to only capture onset of a midi note
     bool midi_note_is_on         = false; // flag to know if MIDI notes is currently on
 
-    UartMidiManager(
+    MidiManager(
         MidiUsbHandler* usb_midi,
-        MidiUartHandler* uart_midi,
         OutputBufferManager* output_buffer_manager, 
         InputBufferManager* input_buffer_manager,
         UartLibreManager* uart_libre_manager, 
         ClockManager* clock_manager,
         HardwareManager* hardware_manager){
             this->usb_midi = usb_midi;
-            this->uart_midi = uart_midi;
             this->output_buffer_manager = output_buffer_manager;
             this->input_buffer_manager = input_buffer_manager;
             this->uart_libre_manager = uart_libre_manager;
@@ -41,9 +37,9 @@ struct UartMidiManager {
 
     void HandleMidiUart(){
         //** MIDI Listener */
-        uart_midi->Listen(); // listen to MIDI for new changes
-        while(uart_midi->HasEvents()) { // when there are messages waiting in the queue...
-            auto midi_event = uart_midi->PopEvent();  // pull the oldest one from the list
+        usb_midi->Listen(); // listen to MIDI for new changes
+        while(usb_midi->HasEvents()) { // when there are messages waiting in the queue...
+            auto midi_event = usb_midi->PopEvent();  // pull the oldest one from the list
             HandleMidiMessage(midi_event);
         }
     }
@@ -189,7 +185,7 @@ struct UartMidiManager {
     //     data[0] = (channel & 0x0F) + 0x90;  // limit channel byte, add status byte
     //     data[1] = note & 0x7F;              // remove MSB on data
     //     data[2] = velocity & 0x7F;
-    //     uart_midi->SendMessage(data, 3);
+    //     usb_midi->SendMessage(data, 3);
 
     //     //** NOTE ON GENERAL MIDI MAPPING* //
     //     data_gen[0] = (general_channel & 0x0F) + 0x90;  // limit channel byte, add status byte
@@ -199,33 +195,33 @@ struct UartMidiManager {
     //     // data_gen[3] = 0xB0;              // CC
     //     // data_gen[4] = part_level_cc & 0x7F;
     //     // data_gen[5] = velocity & 0x7F;
-    //     // uart_midi->SendMessage(data, 3);
+    //     // usb_midi->SendMessage(data, 3);
 
     //     // //** NOTE OFF*//
     //     data[0] = (channel & 0x0F) + 0x80;  // limit channel byte, add status byte
     //     data[2] = velocity_off & 0x7F;
-    //     uart_midi->SendMessage(data, 3);
+    //     usb_midi->SendMessage(data, 3);
 
     //     //** NOTE OFF GENERAL MIDI MAPPING*//
     //     data[0] = (general_channel & 0x0F) + 0x80;  // limit channel byte, add status byte
     //     data[2] = velocity_off & 0x7F;
-    //     uart_midi->SendMessage(data, 3);
+    //     usb_midi->SendMessage(data, 3);
     // }
 
     void SendMidiClock(bool clock_high) {
          uint8_t data[1] = { 0xF8 };
          if (clock_high) {
-            uart_midi->SendMessage(data, 1);
+            usb_midi->SendMessage(data, 1);
          }
     }
 
     void SendMidiPlayStop(bool play_enabled) {
         // if (play_enabled) {
         //     uint8_t data[1] = { 0xFA };
-        //     uart_midi->SendMessage(data, 1);
+        //     usb_midi->SendMessage(data, 1);
         // } else {
         //     uint8_t data[1] = { 0xFC };
-        //     uart_midi->SendMessage(data, 1);
+        //     usb_midi->SendMessage(data, 1);
         // }     
     }
 
@@ -271,33 +267,33 @@ struct UartMidiManager {
         data[0] = (channel & 0x0F) + 0x90;  // limit channel byte, add status byte
         data[1] = note & 0x7F;              // remove MSB on data
         data[2] = velocity & 0x7F;
-        uart_midi->SendMessage(data, 3);
+        usb_midi->SendMessage(data, 3);
 
         //** NOTE ON GENERAL MIDI MAPPING*//
         // data[0] = (general_channel_idx & 0x0F) + 0x90;  // limit channel byte, add status byte
-        // uart_midi->SendMessage(data, 3);  
+        // usb_midi->SendMessage(data, 3);  
 
         //  // TODO MAYBE NEED TO SEPARATE CC TO ITS OWN LIKE WE DO FOR NOTE ON OFF
         // data_cc[0] = (general_channel_idx & 0x0F) + 0xB0;  // limit channel byte, add status byte
         // data_cc[1] = part_level_cc & 0x7F;
         // data_cc[2] = velocity & 0x7F;
-        // uart_midi->SendMessage(data_cc, 3);
+        // usb_midi->SendMessage(data_cc, 3);
 
         // // // TODO MAYBE NEED TO SEPARATE CC TO ITS OWN LIKE WE DO FOR NOTE ON OFF
         // // data_cc[0] = (general_channel_idx & 0x0F) + 0xB0;  // limit channel byte, add status byte
         // // data_cc[1] = 0xB0;              // CC
         // // data_cc[2] = part_level_cc & 0x7F;
         // // data_cc[3] = velocity & 0x7F;
-        // // uart_midi->SendMessage(data_cc, 4);
+        // // usb_midi->SendMessage(data_cc, 4);
 
         // //** NOTE OFF*//
         data[0] = (channel & 0x0F) + 0x80;  // limit channel byte, add status byte
         data[2] = velocity_off & 0x7F;
-        uart_midi->SendMessage(data, 3);
+        usb_midi->SendMessage(data, 3);
 
         //** NOTE OFF GENERAL MIDI MAPPING*//
         // data[0] = (general_channel_idx & 0x0F) + 0x80;  // limit channel byte, add status byte
         // data[2] = velocity_off & 0x7F;
-        // uart_midi->SendMessage(data, 3);
+        // usb_midi->SendMessage(data, 3);
     }
 };
