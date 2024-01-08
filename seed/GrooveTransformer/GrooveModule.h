@@ -20,5 +20,5 @@ std::unique_ptr<OutputBufferManager> output_buffer_manager;
 std::unique_ptr<UartLibreManager> uart_libre_manager;
 std::unique_ptr<InputBufferManager> input_buffer_manager;
 std::unique_ptr<UIComponentsManager> ui_components_manager;
-std::unique_ptr<MidiManager> uart_midi_manager;
+std::unique_ptr<MidiManager> midi_manager;
 std::unique_ptr<PlaybackManager> playback_manager;

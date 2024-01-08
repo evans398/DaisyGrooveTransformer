@@ -41,9 +41,9 @@ struct MidiManager {
 
     void HandleMidiUart(){
         //** MIDI Listener */
-        uart_midi->Listen(); // listen to MIDI for new changes
-        while(uart_midi->HasEvents()) { // when there are messages waiting in the queue...
-            auto midi_event = uart_midi->PopEvent();  // pull the oldest one from the list
+        usb_midi->Listen(); // listen to MIDI for new changes
+        while(usb_midi->HasEvents()) { // when there are messages waiting in the queue...
+            auto midi_event = usb_midi->PopEvent();  // pull the oldest one from the list
             HandleMidiMessage(midi_event);
         }
     }
@@ -101,7 +101,7 @@ struct MidiManager {
     {
         /** Pull the oldest one from the list... */
         int midi_type_enum_value = static_cast<int>(midi_event.type);
-        // hardware_manager->hw->PrintLine("midi_event.type: %d", midi_event.type);
+        hardware_manager->hw->PrintLine("midi_event.type: %d", midi_event.type);
         switch(midi_event.type)
         {
             case NoteOn:
@@ -215,7 +215,7 @@ struct MidiManager {
     void SendMidiClock(bool clock_high) {
          uint8_t data[1] = { 0xF8 };
          if (clock_high) {
-            uart_midi->SendMessage(data, 1);
+            usb_midi->SendMessage(data, 1);
          }
     }
 

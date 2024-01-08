@@ -25,7 +25,7 @@ struct UIComponentsManager {
     InputBufferManager* input_buffer_manager;
     OutputBufferManager* output_buffer_manager;
     ClockManager* clock_manager;
-    MidiManager* uart_midi_manager;
+    MidiManager* midi_manager;
 
     std::array<std::unique_ptr<VoiceDensityPot>, NUM_OUTPUT_VOICES> voice_density_pots;
     std::array<std::unique_ptr<VoiceVelocityScalePot>, NUM_OUTPUT_VOICES> voice_velocity_scale_pots;
@@ -60,7 +60,7 @@ struct UIComponentsManager {
         InputBufferManager* input_buffer_manager,
         OutputBufferManager* output_buffer_manager,
         ClockManager* clock_manager,
-        MidiManager* uart_midi_manager
+        MidiManager* midi_manager
     ) {
         //** Managers */
         this->hardware_manager = hardware_manager;
@@ -68,7 +68,7 @@ struct UIComponentsManager {
         this->input_buffer_manager = input_buffer_manager;
         this->output_buffer_manager = output_buffer_manager;
         this->clock_manager = clock_manager;
-        this->uart_midi_manager = uart_midi_manager;
+        this->midi_manager = midi_manager;
 
         //** Components */
         for (int i=0; i<NUM_OUTPUT_VOICES; i++) {
@@ -97,7 +97,7 @@ struct UIComponentsManager {
         this->groove_cv = std::make_unique<GrooveCV>(GROOVE_VELOCITY_IN, hardware_manager);
         this->cv_clock_input = std::make_unique<CVClockInput>(CLOCK_IN, hardware_manager);
         this->record_overdub_switch = std::make_unique<RecordOverdubSwitch>(uart_libre_manager, input_buffer_manager, hardware_manager);
-        this->play_stop_switch = std::make_unique<PlayStopSwitch>(hardware_manager, clock_manager, uart_midi_manager);
+        this->play_stop_switch = std::make_unique<PlayStopSwitch>(hardware_manager, clock_manager, midi_manager);
     };
 
     void PlayReadAndSetState() {

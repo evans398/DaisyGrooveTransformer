@@ -78,7 +78,7 @@ struct DacOutput {
 };
 
 struct PlaybackManager {
-    MidiManager* uart_midi_manager;
+    MidiManager* midi_manager;
     ClockManager* clock_manager;
     OutputBufferManager* output_buffer_manager;
     HardwareManager* hardware_manager;
@@ -87,12 +87,12 @@ struct PlaybackManager {
     std::array<std::unique_ptr<DacOutput>, NUM_DAC_OUTPUT_VOICES> dac_output_cv;
 
     PlaybackManager(
-        MidiManager* uart_midi_manager, 
+        MidiManager* midi_manager, 
         ClockManager* clock_manager,
         OutputBufferManager* output_buffer_manager,
         HardwareManager* hardware_manager
     ) {
-        this->uart_midi_manager = uart_midi_manager;
+        this->midi_manager = midi_manager;
         this->clock_manager = clock_manager;
         this->output_buffer_manager = output_buffer_manager;
         this->hardware_manager = hardware_manager;
@@ -144,7 +144,7 @@ struct PlaybackManager {
     }
     
     void  TriggerOutputs() {
-        if (uart_midi_manager == nullptr) {
+        if (midi_manager == nullptr) {
             return;
         }
         for (int voice_idx=0; voice_idx<NUM_OUTPUT_VOICES; voice_idx++) {
@@ -158,7 +158,7 @@ struct PlaybackManager {
                     float scaled_velocity = velocity * velocity_scale_amount;
                     if (scaled_velocity > 0) {
                         int scaled_velocity_int = (int) scaled_velocity;
-                        this->uart_midi_manager->SendMidiOutputs(voice_idx, scaled_velocity_int);
+                        this->midi_manager->SendMidiOutputs(voice_idx, scaled_velocity_int);
                         if (voice_idx < NUM_DAC_OUTPUT_VOICES) {
                             // dac_output_triggers[voice_idx]->WriteTriggerToDac();
                             // dac_output_cv[voice_idx]->WriteVelocityToDac(scaled_velocity);
@@ -174,7 +174,7 @@ struct PlaybackManager {
                     float scaled_velocity = velocity * velocity_scale_amount;
                     if (scaled_velocity > 0) {
                         int scaled_velocity_int = (int) scaled_velocity;
-                        this->uart_midi_manager->SendMidiOutputs(voice_idx, scaled_velocity_int);
+                        this->midi_manager->SendMidiOutputs(voice_idx, scaled_velocity_int);
                         if (voice_idx < NUM_DAC_OUTPUT_VOICES) {
                             // dac_output_triggers[voice_idx]->WriteTriggerToDac();
                             // dac_output_cv[voice_idx]->WriteVelocityToDac(scaled_velocity);

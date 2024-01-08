@@ -27,7 +27,7 @@ void sendClockPulse(){
     // TODO ties this with main clock start/stop
     if (clock_manager->play_enabled) {
         hardware_manager->clock_out.Write(clock_high);
-        uart_midi_manager->SendMidiClock(clock_high);
+        midi_manager->SendMidiClock(clock_high);
         playback_manager->TriggerOutputs();
         clock_manager->AdvanceClockIndex();
         // TODO: This needs to be implemented on this clock. at the moment it crashed the program
@@ -79,7 +79,7 @@ int main(void)
     uart_libre_manager = std::make_unique<UartLibreManager> (&uart_libre, output_buffer_manager.get(), hardware_manager.get());
     input_buffer_manager = std::make_unique<InputBufferManager> (uart_libre_manager.get(), clock_manager.get(), hardware_manager.get());
     
-    uart_midi_manager = std::make_unique<MidiManager> (
+    midi_manager = std::make_unique<MidiManager> (
         &usb_midi,
         &uart_midi,
         output_buffer_manager.get(), 
@@ -90,7 +90,7 @@ int main(void)
     );
 
     playback_manager = std::make_unique<PlaybackManager>(
-        uart_midi_manager.get(), 
+        midi_manager.get(), 
         clock_manager.get(), 
         output_buffer_manager.get(), 
         hardware_manager.get()
@@ -111,7 +111,7 @@ int main(void)
         input_buffer_manager.get(),
         output_buffer_manager.get(),
         clock_manager.get(),
-        uart_midi_manager.get()
+        midi_manager.get()
     );
 
     hardware_clock.Start();
@@ -126,31 +126,6 @@ int main(void)
 	hardware_manager->hw->StartLog(true);
     hardware_manager->hw->PrintLine("DAISY ONLINE");
 
-    std::string ng_string = "NG/";
-    std::string gd_string = "GD/";
-    uart_libre_manager->TestHandleLibreFifoMessage(ng_string);
-    for (int idx = 0; idx<3; idx++) {
-        std::string voice_idx = std::to_string(idx);
-        std::string hit_string_2 = "H/" + voice_idx + "/7/12/0";
-        std::string hit_string_3 = "H/" + voice_idx + "/13/127/0";
-        std::string hit_string_4 = "H/" + voice_idx + "/19/80/0";
-        std::string hit_string_1 = "H/" + voice_idx + "/1/45/0";
-        std::string hit_string_5 = "H/" + voice_idx + "/20/90/0";
-        std::string hit_string_6 = "H/" + voice_idx + "/21/10/0";
-        std::string hit_string_7 = "H/" + voice_idx + "/28/127/0";
-        std::string hit_string_8 = "H/" + voice_idx + "/29/110/0";
-        uart_libre_manager->TestHandleLibreFifoMessage(hit_string_1);
-        uart_libre_manager->TestHandleLibreFifoMessage(hit_string_2);
-        uart_libre_manager->TestHandleLibreFifoMessage(hit_string_3);
-        uart_libre_manager->TestHandleLibreFifoMessage(hit_string_4);
-        uart_libre_manager->TestHandleLibreFifoMessage(hit_string_5);
-        uart_libre_manager->TestHandleLibreFifoMessage(hit_string_6);
-        uart_libre_manager->TestHandleLibreFifoMessage(hit_string_7);
-        uart_libre_manager->TestHandleLibreFifoMessage(hit_string_8);
-    }
-    uart_libre_manager->TestHandleLibreFifoMessage(gd_string);
-
-
     // loop forever
     while(1) {
         /** Update all cv inputs */
@@ -162,6 +137,6 @@ int main(void)
         ui_components_manager->ObserveSAPMessage();
         input_buffer_manager->ObserveSAPMessage();
         input_buffer_manager->ObserveRecordBuffer(); //This must be called before Midi is Handled
-        uart_midi_manager->HandleMidiUart();
+        midi_manager->HandleMidiUart();
     }
 }
