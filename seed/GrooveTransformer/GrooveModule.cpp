@@ -32,7 +32,7 @@ void sendClockPulse(){
         clock_manager->AdvanceClockIndex();
         // TODO: This needs to be implemented on this clock. at the moment it crashed the program
         
-        if(c_count % 48 == 0) {
+        if(c_count % 4800 == 0) {
             c_count = 0;
         } else {
             c_count++;
@@ -129,7 +129,7 @@ int main(void)
     // loop forever
     while(1) {
         /** Update all cv inputs */
-        if (clock_manager->ticks_from_start_idx % 12 == 0) {
+        if (clock_manager->ticks_from_start_idx % 200000 == 0) {
             ui_components_manager->ReadUIComponents();
         }
 
@@ -138,5 +138,11 @@ int main(void)
         input_buffer_manager->ObserveSAPMessage();
         input_buffer_manager->ObserveRecordBuffer(); //This must be called before Midi is Handled
         midi_manager->HandleMidiUart();
+
+        System::Delay(2000);
+        midi_manager->MIDISendNoteOn(1, 60, 60);
+        System::Delay(1000);
+        midi_manager->MIDISendNoteOff(1, 60, 60);
+
     }
 }
