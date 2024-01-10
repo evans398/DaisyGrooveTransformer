@@ -3,12 +3,11 @@ using namespace daisy;
 
 TimerHandle         hardware_clock;
 TimerHandle::Config hardware_clock_cfg;
+Logger<LOGGER_SEMIHOST> logger;
 bool clock_high = true;
 int c_count = 0;
 
 MidiUsbHandler usb_midi;
-MidiUartHandler uart_midi;
-UartHandler uart_libre;
 DaisySeed hw;
 I2CHandle i2c;
 
@@ -28,9 +27,8 @@ void sendClockPulse(){
     if (clock_manager->play_enabled) {
         hardware_manager->clock_out.Write(clock_high);
         midi_manager->SendMidiClock(clock_high);
-        playback_manager->TriggerOutputs();
+        // playback_manager->TriggerOutputs();
         clock_manager->AdvanceClockIndex();
-        // TODO: This needs to be implemented on this clock. at the moment it crashed the program
         
         if(c_count % 4800 == 0) {
             c_count = 0;
@@ -52,39 +50,19 @@ int main(void)
 	// hardware_manager->hw->StartLog(true);
     // hardware_manager->hw->PrintLine("DAISY ONLINE");
 
-    // Configure the Uart Peripheral for Pi Communication
-    UartHandler::Config uart_conf;
-    uart_conf.periph        = UartHandler::Config::Peripheral::USART_2;
-    uart_conf.mode          = UartHandler::Config::Mode::TX_RX;
-    uart_conf.pin_config.tx = Pin(PORTA, 2);
-    uart_conf.pin_config.rx = Pin(PORTA, 3);
-
-    // Initialize the uart_libre peripheral and start the DMA transmit
-    uart_libre.Init(uart_conf); 
-
-    /** Start the FIFO Receive */
-    uart_libre.DmaReceiveFifo();
-
     MidiUsbHandler::Config usb_midi_cfg;
     usb_midi_cfg.transport_config.periph = MidiUsbTransport::Config::INTERNAL;
     usb_midi.Init(usb_midi_cfg);
 
-    MidiUartHandler::Config uart_midi_config;
-    uart_midi.Init(uart_midi_config); // Initialize the uart_libre peripheral and start the DMA transmit
-    // uart_midi.StartReceive(); // Start the FIFO Receive
-
     // ** Init Managers */
     clock_manager = std::make_unique<ClockManager> (&hardware_clock, hardware_manager.get());
     output_buffer_manager = std::make_unique<OutputBufferManager> (hardware_manager.get());
-    uart_libre_manager = std::make_unique<UartLibreManager> (&uart_libre, output_buffer_manager.get(), hardware_manager.get());
-    input_buffer_manager = std::make_unique<InputBufferManager> (uart_libre_manager.get(), clock_manager.get(), hardware_manager.get());
+    input_buffer_manager = std::make_unique<InputBufferManager> (clock_manager.get(), hardware_manager.get());
     
     midi_manager = std::make_unique<MidiManager> (
         &usb_midi,
-        &uart_midi,
         output_buffer_manager.get(), 
         input_buffer_manager.get(), 
-        uart_libre_manager.get(), 
         clock_manager.get(),
         hardware_manager.get()
     );
@@ -107,7 +85,6 @@ int main(void)
     
     ui_components_manager = std::make_unique<UIComponentsManager> (
         hardware_manager.get(),
-        uart_libre_manager.get(), 
         input_buffer_manager.get(),
         output_buffer_manager.get(),
         clock_manager.get(),
@@ -122,10 +99,6 @@ int main(void)
     // ** Start Audio Callback */
 	hardware_manager->hw->StartAudio(AudioCallback);
 
-    // ** Initialize logger */
-	hardware_manager->hw->StartLog(true);
-    hardware_manager->hw->PrintLine("DAISY ONLINE");
-
     // loop forever
     while(1) {
         /** Update all cv inputs */
@@ -133,16 +106,125 @@ int main(void)
             ui_components_manager->ReadUIComponents();
         }
 
-        uart_libre_manager->HandleLibreUart();
         ui_components_manager->ObserveSAPMessage();
         input_buffer_manager->ObserveSAPMessage();
         input_buffer_manager->ObserveRecordBuffer(); //This must be called before Midi is Handled
-        midi_manager->HandleMidiUart();
-
-        System::Delay(2000);
-        midi_manager->MIDISendNoteOn(1, 60, 60);
-        System::Delay(1000);
-        midi_manager->MIDISendNoteOff(1, 60, 60);
+        midi_manager->HandleIncomingMidi();
 
     }
 }
+
+// /** Simple example of using USB MIDI
+// *
+// *  When the project boots up, a 100Hz sine wave will emit from both outputs,
+// *  and the Daisy should appear as an Audio/MIDI device on a connected host.
+// *
+// *  To keep the example short, only note on messages are handled, and there
+// *  is only a single oscillator voice that tracks the most recent note message.
+// */
+// #include "daisy_seed.h"
+// #include "daisysp.h"
+
+
+// using namespace daisy;
+// using namespace daisysp;
+
+
+// DaisySeed      hw;
+// MidiUsbHandler midi;
+// Oscillator     osc;
+
+
+// void AudioCallback(AudioHandle::InputBuffer  in,
+//                   AudioHandle::OutputBuffer out,
+//                   size_t                    size)
+// {
+//    for(size_t i = 0; i < size; i++)
+//        out[0][i] = out[1][i] = osc.Process();
+// }
+
+
+//    void MIDISendNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
+//        uint8_t data[3] = { 0 };
+      
+//        data[0] = (channel & 0x0F) + 0x90;  // limit channel byte, add status byte
+//        data[1] = note & 0x7F;              // remove MSB on data
+//        data[2] = velocity & 0x7F;
+
+
+//        midi.SendMessage(data, 3);
+//    }
+
+
+//    void MIDISendNoteOff(uint8_t channel, uint8_t note, uint8_t velocity) {
+//        uint8_t data[3] = { 0 };
+
+
+//        data[0] = (channel & 0x0F) + 0x80;  // limit channel byte, add status byte
+//        data[1] = note & 0x7F;              // remove MSB on data
+//        data[2] = velocity & 0x7F;
+
+
+//        midi.SendMessage(data, 3);
+//    }
+
+
+// int main(void)
+// {
+//    /** Basic initialization of Daisy hardware */
+//    hw.Configure();
+//    hw.Init();
+
+
+//    /** Initialize USB Midi
+//         *  by default this is set to use the built in (USB FS) peripheral.
+//         *
+//         *  by setting midi_cfg.transport_config.periph = MidiUsbTransport::Config::EXTERNAL
+//         *  the USB HS pins can be used (as FS) for MIDI
+//         */
+//    MidiUsbHandler::Config midi_cfg;
+//    midi_cfg.transport_config.periph = MidiUsbTransport::Config::INTERNAL;
+//    midi.Init(midi_cfg);
+
+
+//    /** Initialize our test tone */
+//    osc.Init(hw.AudioSampleRate());
+
+
+//    /** And start the audio callback */
+//    hw.StartAudio(AudioCallback);
+
+
+//    while(1)
+//    {
+//        /** Listen to MIDI for new changes */
+//        midi.Listen();
+
+
+//        /** When there are messages waiting in the queue... */
+//        while(midi.HasEvents())
+//        {
+//            /** Pull the oldest one from the list... */
+//            auto msg = midi.PopEvent();
+//            switch(msg.type)
+//            {
+//                case NoteOn:
+//                {
+//                    /** and change the frequency of the oscillator */
+//                    auto note_msg = msg.AsNoteOn();
+//                    if(note_msg.velocity != 0)
+//                        MIDISendNoteOn(10, note_msg.note, note_msg.velocity);
+//                }
+//                case NoteOff:
+//                {
+//                    auto note_msg = msg.AsNoteOff();
+//                    MIDISendNoteOff(10, note_msg.note, note_msg.velocity);
+//                }
+//                break;
+//                    // Since we only care about note-on messages in this example
+//                    // we'll ignore all other message types
+//                default: break;
+//            }
+//        }
+//    }
+// }

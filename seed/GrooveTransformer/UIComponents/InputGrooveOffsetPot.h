@@ -6,14 +6,12 @@
 struct InputGrooveOffsetPot {
     int mux_channel;
     int mux_idx;
-    UartLibreManager* uart_libre_manager;
     HardwareManager* hardware_manager;
     float prev_scaled_value;
 
-    InputGrooveOffsetPot(int mux_channel, int mux_idx, UartLibreManager* uart_libre_manager, HardwareManager* hardware_manager) {
+    InputGrooveOffsetPot(int mux_channel, int mux_idx, HardwareManager* hardware_manager) {
         this->mux_channel = mux_channel;
         this->mux_idx = mux_idx;
-        this->uart_libre_manager = uart_libre_manager;
         this->hardware_manager = hardware_manager;
         prev_scaled_value = GetScaledValue();
     }
@@ -31,8 +29,7 @@ struct InputGrooveOffsetPot {
         // int scaled_value = GetScaledValue();
         int scaled_value = 0;
         if (scaled_value != prev_scaled_value || force_transmit) {
-            // this->uart_libre_manager->TransmitUIParameterValue(ModelParameter::INPUT_GROOVE_OFFSET, scaled_value);
-            this->uart_libre_manager->TransmitUIParameterValue(ModelParameter::INPUT_GROOVE_OFFSET, 0);
+            return;
         }
         this->prev_scaled_value = scaled_value;
     }

@@ -158,7 +158,7 @@ struct PlaybackManager {
                     float scaled_velocity = velocity * velocity_scale_amount;
                     if (scaled_velocity > 0) {
                         int scaled_velocity_int = (int) scaled_velocity;
-                        this->midi_manager->SendMidiOutputs(voice_idx, scaled_velocity_int);
+                        // this->midi_manager->SendMidiOutputs(voice_idx, scaled_velocity_int);
                         if (voice_idx < NUM_DAC_OUTPUT_VOICES) {
                             // dac_output_triggers[voice_idx]->WriteTriggerToDac();
                             // dac_output_cv[voice_idx]->WriteVelocityToDac(scaled_velocity);
@@ -174,7 +174,7 @@ struct PlaybackManager {
                     float scaled_velocity = velocity * velocity_scale_amount;
                     if (scaled_velocity > 0) {
                         int scaled_velocity_int = (int) scaled_velocity;
-                        this->midi_manager->SendMidiOutputs(voice_idx, scaled_velocity_int);
+                        // this->midi_manager->SendMidiOutputs(voice_idx, scaled_velocity_int);
                         if (voice_idx < NUM_DAC_OUTPUT_VOICES) {
                             // dac_output_triggers[voice_idx]->WriteTriggerToDac();
                             // dac_output_cv[voice_idx]->WriteVelocityToDac(scaled_velocity);

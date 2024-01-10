@@ -21,7 +21,6 @@
 
 struct UIComponentsManager {
     HardwareManager* hardware_manager;
-    UartLibreManager* uart_libre_manager;
     InputBufferManager* input_buffer_manager;
     OutputBufferManager* output_buffer_manager;
     ClockManager* clock_manager;
@@ -56,7 +55,6 @@ struct UIComponentsManager {
 
     UIComponentsManager(
         HardwareManager* hardware_manager,
-        UartLibreManager* uart_libre_manager,
         InputBufferManager* input_buffer_manager,
         OutputBufferManager* output_buffer_manager,
         ClockManager* clock_manager,
@@ -64,7 +62,6 @@ struct UIComponentsManager {
     ) {
         //** Managers */
         this->hardware_manager = hardware_manager;
-        this->uart_libre_manager = uart_libre_manager;
         this->input_buffer_manager = input_buffer_manager;
         this->output_buffer_manager = output_buffer_manager;
         this->clock_manager = clock_manager;
@@ -72,31 +69,31 @@ struct UIComponentsManager {
 
         //** Components */
         for (int i=0; i<NUM_OUTPUT_VOICES; i++) {
-            this->voice_density_pots[i] = std::make_unique<VoiceDensityPot>(i, 0, i, uart_libre_manager, hardware_manager);
+            this->voice_density_pots[i] = std::make_unique<VoiceDensityPot>(i, 0, i, hardware_manager);
             this->voice_velocity_scale_pots[i] = std::make_unique<VoiceVelocityScalePot>(i, 1, i, hardware_manager, output_buffer_manager);
         }
-        this->input_groove_velocity_pot = std::make_unique<InputGrooveVelocityPot>(0, INPUT_GROOVE_VEL_POT, uart_libre_manager, hardware_manager);
-        this->input_groove_offset_pot = std::make_unique<InputGrooveOffsetPot>(0, INPUT_GROOVE_OFF_POT, uart_libre_manager, hardware_manager);
+        this->input_groove_velocity_pot = std::make_unique<InputGrooveVelocityPot>(0, INPUT_GROOVE_VEL_POT, hardware_manager);
+        this->input_groove_offset_pot = std::make_unique<InputGrooveOffsetPot>(0, INPUT_GROOVE_OFF_POT, hardware_manager);
         this->tempo_pot = std::make_unique<TempoPot>(1, TEMPO_POT, clock_manager, hardware_manager);
-        this->interpolation_pot = std::make_unique<InterpolationPot>(2, INTERPOLATION_POT, uart_libre_manager, hardware_manager);
+        this->interpolation_pot = std::make_unique<InterpolationPot>(2, INTERPOLATION_POT, hardware_manager);
         this->shift_button = std::make_unique<ShiftButton>(this->hardware_manager);
-        this->interpolation_button_a = std::make_unique<InterpolationButton>(InterpolationButtonName::BUTTON_A, uart_libre_manager, hardware_manager);
-        this->interpolation_button_b = std::make_unique<InterpolationButton>(InterpolationButtonName::BUTTON_B, uart_libre_manager, hardware_manager);
+        this->interpolation_button_a = std::make_unique<InterpolationButton>(InterpolationButtonName::BUTTON_A, hardware_manager);
+        this->interpolation_button_b = std::make_unique<InterpolationButton>(InterpolationButtonName::BUTTON_B, hardware_manager);
         this->preset_pot = std::make_unique<PresetPot>(PRESET_KNOB, hardware_manager);
-        this->save_button = std::make_unique<SaveButton>(this->preset_pot.get(), uart_libre_manager, hardware_manager);
-        this->clear_button = std::make_unique<ClearButton>(uart_libre_manager, hardware_manager, input_buffer_manager);
-        this->uncertainty_cv_input = std::make_unique<GPCV>(2, UNCERTAINTY_CV, uart_libre_manager, hardware_manager);
-        this->uncertainty_pot = std::make_unique<GeneralPurposeParameterPot>(1, UNCERTAINTY_POT, uart_libre_manager, hardware_manager, this->uncertainty_cv_input.get(), ModelParameter::UNCERTAINTY);
-        this->gp_cv_1 = std::make_unique<GPCV>(2, GP_CV_1, uart_libre_manager, hardware_manager);
-        this->gp_cv_2 = std::make_unique<GPCV>(2, GP_CV_2, uart_libre_manager, hardware_manager);
-        this->gp_cv_3 = std::make_unique<GPCV>(2, GP_CV_3, uart_libre_manager, hardware_manager);
-        this->general_purpose_parameter_pot_1 = std::make_unique<GeneralPurposeParameterPot>(2, GP_POT_1, uart_libre_manager, hardware_manager, this->gp_cv_1.get(), ModelParameter::GENERAL_PURPOSE);
-        this->general_purpose_parameter_pot_2 = std::make_unique<GeneralPurposeParameterPot>(2, GP_POT_2, uart_libre_manager, hardware_manager, this->gp_cv_2.get(), ModelParameter::GENERAL_PURPOSE);
-        this->general_purpose_parameter_pot_3 = std::make_unique<GeneralPurposeParameterPot>(2, GP_POT_3, uart_libre_manager, hardware_manager, this->gp_cv_3.get(), ModelParameter::GENERAL_PURPOSE);
+        this->save_button = std::make_unique<SaveButton>(this->preset_pot.get(), hardware_manager);
+        this->clear_button = std::make_unique<ClearButton>(hardware_manager, input_buffer_manager);
+        this->uncertainty_cv_input = std::make_unique<GPCV>(2, UNCERTAINTY_CV, hardware_manager);
+        this->uncertainty_pot = std::make_unique<GeneralPurposeParameterPot>(1, UNCERTAINTY_POT, hardware_manager, this->uncertainty_cv_input.get(), ModelParameter::UNCERTAINTY);
+        this->gp_cv_1 = std::make_unique<GPCV>(2, GP_CV_1, hardware_manager);
+        this->gp_cv_2 = std::make_unique<GPCV>(2, GP_CV_2, hardware_manager);
+        this->gp_cv_3 = std::make_unique<GPCV>(2, GP_CV_3, hardware_manager);
+        this->general_purpose_parameter_pot_1 = std::make_unique<GeneralPurposeParameterPot>(2, GP_POT_1, hardware_manager, this->gp_cv_1.get(), ModelParameter::GENERAL_PURPOSE);
+        this->general_purpose_parameter_pot_2 = std::make_unique<GeneralPurposeParameterPot>(2, GP_POT_2, hardware_manager, this->gp_cv_2.get(), ModelParameter::GENERAL_PURPOSE);
+        this->general_purpose_parameter_pot_3 = std::make_unique<GeneralPurposeParameterPot>(2, GP_POT_3, hardware_manager, this->gp_cv_3.get(), ModelParameter::GENERAL_PURPOSE);
         this->groove_gate = std::make_unique<GrooveGate>(GROOVE_TRIGGER_IN, hardware_manager);
         this->groove_cv = std::make_unique<GrooveCV>(GROOVE_VELOCITY_IN, hardware_manager);
         this->cv_clock_input = std::make_unique<CVClockInput>(CLOCK_IN, hardware_manager);
-        this->record_overdub_switch = std::make_unique<RecordOverdubSwitch>(uart_libre_manager, input_buffer_manager, hardware_manager);
+        this->record_overdub_switch = std::make_unique<RecordOverdubSwitch>(input_buffer_manager, hardware_manager);
         this->play_stop_switch = std::make_unique<PlayStopSwitch>(hardware_manager, clock_manager, midi_manager);
     };
 
@@ -134,8 +131,7 @@ struct UIComponentsManager {
     }
 
     void ObserveSAPMessage() {
-        if(this->uart_libre_manager->SEND_ALL_UI_PARAMS) {
-            this->uart_libre_manager->SEND_ALL_UI_PARAMS = false;
+        if(false) {
             for (auto&& voice_density_pot : this->voice_density_pots) {
                 voice_density_pot->TransmitNewValue(true);
             }

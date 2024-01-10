@@ -27,7 +27,7 @@ struct GrooveGate {
         // int scaled_value = GetScaledValue();
         if (scaled_value != prev_scaled_value || force_transmit) {
             // hardware_manager->hw->PrintLine("Groove Gate: " FLT_FMT3, FLT_VAR3(scaled_value));
-            // this->uart_libre_manager->TransmitUIParameterValue(ModelParameter::UNCERTAINTY, scaled_value);
+
         }
         this->prev_scaled_value = scaled_value;
     }

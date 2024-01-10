@@ -8,7 +8,6 @@ struct GeneralPurposeParameterPot {
     int mux_channel;
     int mux_idx;
     int general_purpose_pot_index;
-    UartLibreManager* uart_libre_manager;
     HardwareManager* hardware_manager;
     GPCV* general_purpose_cv_input;
     enum ModelParameter model_parameter;
@@ -17,13 +16,11 @@ struct GeneralPurposeParameterPot {
     GeneralPurposeParameterPot(
         int mux_channel, 
         int mux_idx, 
-        UartLibreManager* uart_libre_manager, 
         HardwareManager* hardware_manager,
         GPCV* general_purpose_cv_input,
         enum ModelParameter model_parameter) {
         this->mux_channel=mux_channel;
         this->mux_idx=mux_idx;
-        this->uart_libre_manager=uart_libre_manager;
         this->hardware_manager=hardware_manager;
         this->general_purpose_cv_input=general_purpose_cv_input;
         this->model_parameter=model_parameter;
@@ -55,10 +52,8 @@ struct GeneralPurposeParameterPot {
         if (combined_value != prev_scaled_value || force_transmit) {
             switch(this->model_parameter) {
                 case ModelParameter::GENERAL_PURPOSE:
-                    this->uart_libre_manager->TransmitUIIndexedParameterValue(this->model_parameter, this->general_purpose_pot_index+1, combined_value);
                     break;
                 case ModelParameter::UNCERTAINTY:
-                    this->uart_libre_manager->TransmitUIParameterValue(ModelParameter::UNCERTAINTY, combined_value);
                     break;
                 default:
                     break;

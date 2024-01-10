@@ -5,14 +5,12 @@
 #include "UIComponentHelper.h"
 
 struct RecordOverdubSwitch {
-    UartLibreManager* uart_libre_manager;
     InputBufferManager* input_buffer_manager;
     HardwareManager* hardware_manager;
     bool rec_enabled;
     bool overdub_enabled;
 
-    RecordOverdubSwitch(UartLibreManager* uart_libre_manager, InputBufferManager* input_buffer_manager, HardwareManager* hardware_manager) {
-        this->uart_libre_manager = uart_libre_manager;
+    RecordOverdubSwitch(InputBufferManager* input_buffer_manager, HardwareManager* hardware_manager) {
         this->input_buffer_manager = input_buffer_manager;
         this->hardware_manager = hardware_manager;
         hardware_manager->record_switch.Debounce();
