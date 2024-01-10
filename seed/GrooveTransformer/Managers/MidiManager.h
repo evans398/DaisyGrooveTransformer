@@ -47,18 +47,22 @@ struct MidiManager {
         {
             case NoteOn:
             {
-                // System::Delay(1);
                 auto note_msg = msg.AsNoteOn();
                 if (note_msg.velocity != 0) {
-                    MIDISendNoteOn(10, note_msg.note, note_msg.velocity);
+                    MIDISendNoteOn(12, note_msg.note, note_msg.velocity);
+                    // Send MIDI CC message on channel 1, controller 1, value 64
+                    // SendMidiCC(2, 10, 99);
+                    // // System::Delay(1);
+                    // SendMidiCC(5, 43, 81);
+                    // MIDISendNoteOn(12, 50, note_msg.velocity);
+                    // MIDISendNoteOn(3, 89, note_msg.velocity);
                 } 
             }
             break;
             case NoteOff:
             {
-                // System::Delay(1);
                 auto note_msg = msg.AsNoteOff();
-                MIDISendNoteOff(10, note_msg.note, note_msg.velocity);
+                MIDISendNoteOff(12, note_msg.note, note_msg.velocity);
             }
             break;
             case SystemRealTime:
@@ -120,6 +124,29 @@ struct MidiManager {
         }
     }
 
+    void SendMidiCC(uint8_t channel, uint8_t controllerNumber, uint8_t value) {
+        // // Ensure that the channel is within the valid MIDI channel range (1-16)
+        // if (channel < 1 || channel > 16) {
+        //     // Handle invalid channel
+        //     return;
+        // }
+
+        // // Ensure that the controllerNumber and value are within valid MIDI ranges (0-127)
+        // if (controllerNumber > 127 || value > 127) {
+        //     // Handle invalid controllerNumber or value
+        //     return;
+        // }
+
+        // Calculate the status byte for the MIDI CC message
+        uint8_t statusByte = 0xB4; // 0xB0 is the status byte for MIDI CC on channel 1
+
+        // Construct the MIDI CC message
+        uint8_t data[3] = { statusByte, controllerNumber, value };
+
+        // Send the MIDI CC message
+        usb_midi->SendMessage(data, 3);
+    }
+
     void SendMidiClock(bool clock_high) {
          uint8_t data[1] = { 0xF8 };
          if (clock_high) {
@@ -128,9 +155,19 @@ struct MidiManager {
     }
     
     void MIDISendNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
+        // Ensure that the channel is within the valid MIDI channel range (1-16)
+        if (channel < 1 || channel > 16) {
+            return;
+        }
+
+        // Ensure that the note and velocity are within valid MIDI ranges (0-127)
+        if (note > 127 || velocity > 127) {
+            return;
+        }
+
         uint8_t data[3] = { 0 };
         
-        data[0] = (channel & 0x0F) + 0x90;  // limit channel byte, add status byte
+        data[0] = ((channel - 1) & 0x0F) + 0x90;  // limit channel byte, add status byte
         data[1] = note & 0x7F;              // remove MSB on data
         data[2] = velocity & 0x7F;
 
@@ -138,9 +175,19 @@ struct MidiManager {
     }
 
     void MIDISendNoteOff(uint8_t channel, uint8_t note, uint8_t velocity) {
+        // Ensure that the channel is within the valid MIDI channel range (1-16)
+        if (channel < 1 || channel > 16) {
+            return;
+        }
+
+        // Ensure that the note and velocity are within valid MIDI ranges (0-127)
+        if (note > 127 || velocity > 127) {
+            return;
+        }
+
         uint8_t data[3] = { 0 };
 
-        data[0] = (channel & 0x0F) + 0x80;  // limit channel byte, add status byte
+        data[0] = ((channel - 1) & 0x0F) + 0x80;  // limit channel byte, add status byte
         data[1] = note & 0x7F;              // remove MSB on data
         data[2] = velocity & 0x7F;
 
