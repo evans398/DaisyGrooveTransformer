@@ -3,6 +3,7 @@
 
 struct MidiManager {
     MidiUsbHandler* usb_midi;
+    MidiUartHandler* uart_midi;
     OutputBufferManager* output_buffer_manager;
     InputBufferManager* input_buffer_manager;
     ClockManager* clock_manager;
@@ -21,11 +22,13 @@ struct MidiManager {
 
     MidiManager(
         MidiUsbHandler* usb_midi,
+        MidiUartHandler* uart_midi,
         OutputBufferManager* output_buffer_manager, 
         InputBufferManager* input_buffer_manager,
         ClockManager* clock_manager,
         HardwareManager* hardware_manager){
             this->usb_midi = usb_midi;
+            this->uart_midi = uart_midi;
             this->output_buffer_manager = output_buffer_manager;
             this->input_buffer_manager = input_buffer_manager;
             this->clock_manager = clock_manager;
@@ -33,23 +36,30 @@ struct MidiManager {
     };
 
     void HandleIncomingMidi(){
-        //** MIDI Listener */
-        usb_midi->Listen(); // listen to MIDI for new changes
-        while(usb_midi->HasEvents()) { // when there are messages waiting in the queue...
+        // //** USB MIDI Listener */
+        // usb_midi->Listen(); // listen to MIDI for new changes
+        // while(usb_midi->HasEvents()) { // when there are messages waiting in the queue...
+        //     HandleMidiMessage();
+        // }
+        //** UUART MIDI Listener */
+        uart_midi->Listen(); // listen to MIDI for new changes
+        while(uart_midi->HasEvents()) { // when there are messages waiting in the queue...
             HandleMidiMessage();
         }
     }
 
     void HandleMidiMessage()
     {
-        auto msg = usb_midi->PopEvent();  // pull the oldest message from the list
+        auto msg = uart_midi->PopEvent();  // pull the oldest message from the list
         switch(msg.type)
         {
             case NoteOn:
             {
                 auto note_msg = msg.AsNoteOn();
                 if (note_msg.velocity != 0) {
+
                     MIDISendNoteOn(12, note_msg.note, note_msg.velocity);
+
                     // Send MIDI CC message on channel 1, controller 1, value 64
                     // SendMidiCC(2, 10, 99);
                     // // System::Delay(1);
@@ -125,17 +135,17 @@ struct MidiManager {
     }
 
     void SendMidiCC(uint8_t channel, uint8_t controllerNumber, uint8_t value) {
-        // // Ensure that the channel is within the valid MIDI channel range (1-16)
-        // if (channel < 1 || channel > 16) {
-        //     // Handle invalid channel
-        //     return;
-        // }
+        // Ensure that the channel is within the valid MIDI channel range (1-16)
+        if (channel < 1 || channel > 16) {
+            // Handle invalid channel
+            return;
+        }
 
-        // // Ensure that the controllerNumber and value are within valid MIDI ranges (0-127)
-        // if (controllerNumber > 127 || value > 127) {
-        //     // Handle invalid controllerNumber or value
-        //     return;
-        // }
+        // Ensure that the controllerNumber and value are within valid MIDI ranges (0-127)
+        if (controllerNumber > 127 || value > 127) {
+            // Handle invalid controllerNumber or value
+            return;
+        }
 
         // Calculate the status byte for the MIDI CC message
         uint8_t statusByte = 0xB4; // 0xB0 is the status byte for MIDI CC on channel 1
@@ -144,13 +154,13 @@ struct MidiManager {
         uint8_t data[3] = { statusByte, controllerNumber, value };
 
         // Send the MIDI CC message
-        usb_midi->SendMessage(data, 3);
+        uart_midi->SendMessage(data, 3);
     }
 
     void SendMidiClock(bool clock_high) {
          uint8_t data[1] = { 0xF8 };
          if (clock_high) {
-            usb_midi->SendMessage(data, 1);
+            uart_midi->SendMessage(data, 1);
          }
     }
     
@@ -171,7 +181,7 @@ struct MidiManager {
         data[1] = note & 0x7F;              // remove MSB on data
         data[2] = velocity & 0x7F;
 
-        usb_midi->SendMessage(data, 3);
+        uart_midi->SendMessage(data, 3);
     }
 
     void MIDISendNoteOff(uint8_t channel, uint8_t note, uint8_t velocity) {
@@ -191,7 +201,7 @@ struct MidiManager {
         data[1] = note & 0x7F;              // remove MSB on data
         data[2] = velocity & 0x7F;
 
-        usb_midi->SendMessage(data, 3);
+        uart_midi->SendMessage(data, 3);
     }
 
     void SendMidiPlayStop(bool play_enabled) {

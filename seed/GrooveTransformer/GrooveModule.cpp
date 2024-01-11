@@ -8,6 +8,7 @@ bool clock_high = true;
 int c_count = 0;
 
 MidiUsbHandler usb_midi;
+MidiUartHandler uart_midi;
 DaisySeed hw;
 I2CHandle i2c;
 
@@ -50,9 +51,13 @@ int main(void)
 	// hardware_manager->hw->StartLog(true);
     // hardware_manager->hw->PrintLine("DAISY ONLINE");
 
-    MidiUsbHandler::Config usb_midi_cfg;
-    usb_midi_cfg.transport_config.periph = MidiUsbTransport::Config::INTERNAL;
-    usb_midi.Init(usb_midi_cfg);
+    MidiUartHandler::Config uart_midi_config;
+    uart_midi.Init(uart_midi_config);
+    uart_midi.StartReceive();
+
+    // MidiUsbHandler::Config usb_midi_cfg;
+    // usb_midi_cfg.transport_config.periph = MidiUsbTransport::Config::INTERNAL;
+    // usb_midi.Init(usb_midi_cfg);
 
     // ** Init Managers */
     clock_manager = std::make_unique<ClockManager> (&hardware_clock, hardware_manager.get());
@@ -61,6 +66,7 @@ int main(void)
     
     midi_manager = std::make_unique<MidiManager> (
         &usb_midi,
+        &uart_midi,
         output_buffer_manager.get(), 
         input_buffer_manager.get(), 
         clock_manager.get(),
