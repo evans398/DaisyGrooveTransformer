@@ -75,21 +75,21 @@ struct UIComponentsManager {
         this->input_groove_velocity_pot = std::make_unique<InputGrooveVelocityPot>(0, INPUT_GROOVE_VEL_POT, hardware_manager);
         this->input_groove_offset_pot = std::make_unique<InputGrooveOffsetPot>(0, INPUT_GROOVE_OFF_POT, hardware_manager);
         this->tempo_pot = std::make_unique<TempoPot>(1, TEMPO_POT, clock_manager, hardware_manager);
-        this->interpolation_pot = std::make_unique<InterpolationPot>(2, INTERPOLATION_POT, hardware_manager);
+        this->interpolation_pot = std::make_unique<InterpolationPot>(2, INTERPOLATION_POT, this);
         this->shift_button = std::make_unique<ShiftButton>(this->hardware_manager);
-        this->interpolation_button_a = std::make_unique<InterpolationButton>(InterpolationButtonName::BUTTON_A, hardware_manager);
-        this->interpolation_button_b = std::make_unique<InterpolationButton>(InterpolationButtonName::BUTTON_B, hardware_manager);
+        this->interpolation_button_a = std::make_unique<InterpolationButton>(Interpolation_Button_Name::BUTTON_A, hardware_manager);
+        this->interpolation_button_b = std::make_unique<InterpolationButton>(Interpolation_Button_Name::BUTTON_B, hardware_manager);
         this->preset_pot = std::make_unique<PresetPot>(PRESET_KNOB, hardware_manager);
         this->save_button = std::make_unique<SaveButton>(this->preset_pot.get(), hardware_manager);
         this->clear_button = std::make_unique<ClearButton>(hardware_manager, input_buffer_manager);
         this->uncertainty_cv_input = std::make_unique<GPCV>(2, UNCERTAINTY_CV, hardware_manager);
-        this->uncertainty_pot = std::make_unique<GeneralPurposeParameterPot>(1, UNCERTAINTY_POT, hardware_manager, this->uncertainty_cv_input.get(), ModelParameter::UNCERTAINTY);
+        this->uncertainty_pot = std::make_unique<GeneralPurposeParameterPot>(1, UNCERTAINTY_POT, hardware_manager, this->uncertainty_cv_input.get(), Model_Parameter::UNCERTAINTY);
         this->gp_cv_1 = std::make_unique<GPCV>(2, GP_CV_1, hardware_manager);
         this->gp_cv_2 = std::make_unique<GPCV>(2, GP_CV_2, hardware_manager);
         this->gp_cv_3 = std::make_unique<GPCV>(2, GP_CV_3, hardware_manager);
-        this->general_purpose_parameter_pot_1 = std::make_unique<GeneralPurposeParameterPot>(2, GP_POT_1, hardware_manager, this->gp_cv_1.get(), ModelParameter::GENERAL_PURPOSE);
-        this->general_purpose_parameter_pot_2 = std::make_unique<GeneralPurposeParameterPot>(2, GP_POT_2, hardware_manager, this->gp_cv_2.get(), ModelParameter::GENERAL_PURPOSE);
-        this->general_purpose_parameter_pot_3 = std::make_unique<GeneralPurposeParameterPot>(2, GP_POT_3, hardware_manager, this->gp_cv_3.get(), ModelParameter::GENERAL_PURPOSE);
+        this->general_purpose_parameter_pot_1 = std::make_unique<GeneralPurposeParameterPot>(2, GP_POT_1, hardware_manager, this->gp_cv_1.get(), Model_Parameter::GENERAL_PURPOSE);
+        this->general_purpose_parameter_pot_2 = std::make_unique<GeneralPurposeParameterPot>(2, GP_POT_2, hardware_manager, this->gp_cv_2.get(), Model_Parameter::GENERAL_PURPOSE);
+        this->general_purpose_parameter_pot_3 = std::make_unique<GeneralPurposeParameterPot>(2, GP_POT_3, hardware_manager, this->gp_cv_3.get(), Model_Parameter::GENERAL_PURPOSE);
         this->groove_gate = std::make_unique<GrooveGate>(GROOVE_TRIGGER_IN, hardware_manager);
         this->groove_cv = std::make_unique<GrooveCV>(GROOVE_VELOCITY_IN, hardware_manager);
         this->cv_clock_input = std::make_unique<CVClockInput>(CLOCK_IN, hardware_manager);
@@ -145,5 +145,57 @@ struct UIComponentsManager {
             this->general_purpose_parameter_pot_3->TransmitNewValue(true);
 
         }
+    }
+
+    float GetMuxValue(int mux_channel, int mux_idx){
+        return this->hardware_manager->hw->adc.GetMuxFloat(mux_channel, mux_idx);
+    }
+
+    int GetScaledValue(int mux_channel, int mux_idx){
+        return ScalePotValue(this->GetMuxValue(mux_channel, mux_idx));
+    }
+
+    int ScalePotValue(float value) {
+        float scaled_value = value * 100.;
+        int scaled_value_int = (int) scaled_value;
+        return RoundScaledValue(scaled_value_int);
+    }
+
+    int RoundScaledValue(int scaled_value) {
+        int rounded_value;
+        int remainder = scaled_value % 5;
+        if (scaled_value == 99) {
+            return 100;
+        }
+        if (scaled_value == 1) {
+            return 0;
+        }
+        if (remainder == 0) {
+            rounded_value = scaled_value;
+        }
+        if(remainder < 3){
+            rounded_value = scaled_value - remainder;
+        }
+        if(remainder > 2){
+            rounded_value = scaled_value + (5 - remainder);
+        }
+        return rounded_value;
+    }
+
+    // TODO: IMPLEMENT FOR INTERP POT
+    int ScaleInterpolationPotValue(float value) {
+        float scaled_value = value * 100.;
+        int scaled_value_int = (int) scaled_value;
+        if (scaled_value > 99) {
+            return 100;
+        }
+        if (scaled_value < 1) {
+            return 0;
+        }
+        return scaled_value_int;
+    }
+
+    void TransmitValue(uint8_t cc_number, uint8_t value){
+        this->midi_manager->SendMidiCC(MIDI_CC::MIDI_CC_CHANNEL, cc_number, value);
     }
 };

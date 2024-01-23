@@ -10,7 +10,7 @@ struct GeneralPurposeParameterPot {
     int general_purpose_pot_index;
     HardwareManager* hardware_manager;
     GPCV* general_purpose_cv_input;
-    enum ModelParameter model_parameter;
+    enum Model_Parameter model_parameter;
     float prev_scaled_value;
 
     GeneralPurposeParameterPot(
@@ -18,7 +18,7 @@ struct GeneralPurposeParameterPot {
         int mux_idx, 
         HardwareManager* hardware_manager,
         GPCV* general_purpose_cv_input,
-        enum ModelParameter model_parameter) {
+        enum Model_Parameter model_parameter) {
         this->mux_channel=mux_channel;
         this->mux_idx=mux_idx;
         this->hardware_manager=hardware_manager;
@@ -51,9 +51,9 @@ struct GeneralPurposeParameterPot {
         }
         if (combined_value != prev_scaled_value || force_transmit) {
             switch(this->model_parameter) {
-                case ModelParameter::GENERAL_PURPOSE:
+                case Model_Parameter::GENERAL_PURPOSE:
                     break;
-                case ModelParameter::UNCERTAINTY:
+                case Model_Parameter::UNCERTAINTY:
                     break;
                 default:
                     break;

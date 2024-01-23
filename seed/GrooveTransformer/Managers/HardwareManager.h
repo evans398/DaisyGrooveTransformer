@@ -105,7 +105,7 @@ struct HardwareManager {
         adc_cfg[PRESET_KNOB].InitSingle(seed::A3);
 
         /** Initialize the ADC with our configuration */
-        hw->adc.Init(adc_cfg, AdcChannel::NUM_ADC_CHANNELS);
+        hw->adc.Init(adc_cfg, Adc_Channel::NUM_ADC_CHANNELS);
         /** Start the ADC conversions in the background */
         hw->adc.Start();
     }

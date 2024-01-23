@@ -14,11 +14,11 @@ static uint8_t DMA_BUFFER_MEM_SECTION dac_buffer[DAC_BUFF_SIZE];
 struct DacOutput {
     int voice_index;
     unsigned char address;
-    enum DAC_CHANNEL dac_channel;
+    enum DAC_Channel dac_channel;
     HardwareManager* hardware_manager;
     int reset_counter = 0;
 
-    DacOutput(int voice_index, unsigned char address, DAC_CHANNEL dac_channel, HardwareManager* hardware_manager) {
+    DacOutput(int voice_index, unsigned char address, DAC_Channel dac_channel, HardwareManager* hardware_manager) {
         this->voice_index=voice_index;
         this->address = address;
         this->dac_channel = dac_channel;
@@ -97,19 +97,19 @@ struct PlaybackManager {
         this->output_buffer_manager = output_buffer_manager;
         this->hardware_manager = hardware_manager;
 
-        this->dac_output_triggers[0] = std::make_unique<DacOutput>(0, DAC_1_ADDRESS, DAC_CHANNEL::A, hardware_manager);
-        this->dac_output_triggers[1] = std::make_unique<DacOutput>(1, DAC_1_ADDRESS, DAC_CHANNEL::C, hardware_manager);
-        this->dac_output_triggers[2] = std::make_unique<DacOutput>(2, DAC_2_ADDRESS, DAC_CHANNEL::A, hardware_manager);
-        this->dac_output_triggers[3] = std::make_unique<DacOutput>(3, DAC_2_ADDRESS, DAC_CHANNEL::C, hardware_manager);
-        // this->dac_output_triggers[4] = std::make_unique<DacOutput>(4, DAC_3_ADDRESS, DAC_CHANNEL::A, hardware_manager);
-        // this->dac_output_triggers[5] = std::make_unique<DacOutput>(5, DAC_3_ADDRESS, DAC_CHANNEL::C, hardware_manager);
+        this->dac_output_triggers[0] = std::make_unique<DacOutput>(0, DAC_1_ADDRESS, DAC_Channel::A, hardware_manager);
+        this->dac_output_triggers[1] = std::make_unique<DacOutput>(1, DAC_1_ADDRESS, DAC_Channel::C, hardware_manager);
+        this->dac_output_triggers[2] = std::make_unique<DacOutput>(2, DAC_2_ADDRESS, DAC_Channel::A, hardware_manager);
+        this->dac_output_triggers[3] = std::make_unique<DacOutput>(3, DAC_2_ADDRESS, DAC_Channel::C, hardware_manager);
+        // this->dac_output_triggers[4] = std::make_unique<DacOutput>(4, DAC_3_ADDRESS, DAC_Channel::A, hardware_manager);
+        // this->dac_output_triggers[5] = std::make_unique<DacOutput>(5, DAC_3_ADDRESS, DAC_Channel::C, hardware_manager);
 
-        this->dac_output_cv[0] = std::make_unique<DacOutput>(0, DAC_1_ADDRESS, DAC_CHANNEL::B, hardware_manager);
-        this->dac_output_cv[1] = std::make_unique<DacOutput>(1, DAC_1_ADDRESS, DAC_CHANNEL::D, hardware_manager);
-        this->dac_output_cv[2] = std::make_unique<DacOutput>(2, DAC_2_ADDRESS, DAC_CHANNEL::B, hardware_manager);
-        this->dac_output_cv[3] = std::make_unique<DacOutput>(3, DAC_2_ADDRESS, DAC_CHANNEL::D, hardware_manager);
-        // this->dac_output_cv[4] = std::make_unique<DacOutput>(4, DAC_3_ADDRESS, DAC_CHANNEL::B, hardware_manager);
-        // this->dac_output_cv[5] = std::make_unique<DacOutput>(5, DAC_3_ADDRESS, DAC_CHANNEL::D, hardware_manager);
+        this->dac_output_cv[0] = std::make_unique<DacOutput>(0, DAC_1_ADDRESS, DAC_Channel::B, hardware_manager);
+        this->dac_output_cv[1] = std::make_unique<DacOutput>(1, DAC_1_ADDRESS, DAC_Channel::D, hardware_manager);
+        this->dac_output_cv[2] = std::make_unique<DacOutput>(2, DAC_2_ADDRESS, DAC_Channel::B, hardware_manager);
+        this->dac_output_cv[3] = std::make_unique<DacOutput>(3, DAC_2_ADDRESS, DAC_Channel::D, hardware_manager);
+        // this->dac_output_cv[4] = std::make_unique<DacOutput>(4, DAC_3_ADDRESS, DAC_Channel::B, hardware_manager);
+        // this->dac_output_cv[5] = std::make_unique<DacOutput>(5, DAC_3_ADDRESS, DAC_Channel::D, hardware_manager);
     };
 
     void WriteToDac1(int val) {

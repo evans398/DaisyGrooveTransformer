@@ -7,7 +7,7 @@ struct GrooveCV {
     HardwareManager* hardware_manager;
     float prev_scaled_value;
 
-    GrooveCV(enum AdcChannel adc_channel, HardwareManager* hardware_manager) {
+    GrooveCV(enum Adc_Channel adc_channel, HardwareManager* hardware_manager) {
         this->adc_channel = adc_channel;
         this->hardware_manager = hardware_manager;
         this->prev_scaled_value = GetScaledValue();

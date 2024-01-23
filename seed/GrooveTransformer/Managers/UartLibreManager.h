@@ -300,7 +300,7 @@ struct UartLibreManager {
         
     }
 
-    void TransmitUIIndexedParameterValue(enum ModelParameter model_parameter, int index_int, int value_int) {
+    void TransmitUIIndexedParameterValue(enum Model_Parameter model_parameter, int index_int, int value_int) {
         /** Convert int values to string */
         std::string value = std::to_string(value_int);
         std::string index = std::to_string(index_int);
@@ -308,12 +308,12 @@ struct UartLibreManager {
 
         /** Construct message to transmit */
         switch(model_parameter) {
-            case ModelParameter::VOICE_DENSITY:
+            case Model_Parameter::VOICE_DENSITY:
             {
                 transmit_message = ("DP/" + index + '/' + value + "\n");
                 break; 
             }
-            case ModelParameter::GENERAL_PURPOSE:
+            case Model_Parameter::GENERAL_PURPOSE:
             {
                 transmit_message = ("GP/" + index + '/' + value + "\n");
                 break;
@@ -329,38 +329,38 @@ struct UartLibreManager {
         this->uart_libre->BlockingTransmit(&tx_buff[0], transmit_message.length()); // trasmit tx buffer
     }
 
-    void TransmitUIParameterValue(enum ModelParameter model_parameter, int value_int) {
+    void TransmitUIParameterValue(enum Model_Parameter model_parameter, int value_int) {
         /** Convert int values to string */
         std::string value = std::to_string(value_int);
         std::string transmit_message;
 
         switch(model_parameter) {
-            case ModelParameter::INPUT_GROOVE_VELOCITY:
+            case Model_Parameter::INPUT_GROOVE_VELOCITY:
             {
                 transmit_message = ("GV/" + value + "\n");
                 break;
             }
-            case ModelParameter::INPUT_GROOVE_OFFSET:
+            case Model_Parameter::INPUT_GROOVE_OFFSET:
             {
                 transmit_message = ("GO/" + value + "\n");
                 break;
             }
-            case ModelParameter::UNCERTAINTY:
+            case Model_Parameter::UNCERTAINTY:
             {
                 transmit_message = ("RP/" + value + "\n");
                 break;
             }
-            case ModelParameter::INTERPOLATION_POSITION:
+            case Model_Parameter::INTERPOLATION_POSITION:
             {
                 transmit_message = ("IP/" + value + "\n");
                 break;
             }
-            case ModelParameter::LOAD_PRESET:
+            case Model_Parameter::LOAD_PRESET:
             {
                 transmit_message = ("LP/" + value + "\n");
                 break;
             }
-            case ModelParameter::SAVE_PRESET:
+            case Model_Parameter::SAVE_PRESET:
             {
                 transmit_message = ("SP/" + value + "\n");
                 break;
@@ -376,41 +376,41 @@ struct UartLibreManager {
         this->uart_libre->BlockingTransmit(&tx_buff[0], transmit_message.length()); // trasmit tx buffer
     }
 
-    void TransmitUIParameterState(enum ModelParameter model_parameter) {
+    void TransmitUIParameterState(enum Model_Parameter model_parameter) {
         std::string transmit_message;
 
         switch(model_parameter) {
-            case ModelParameter::INTERPOLATION_SAVE_A:
+            case Model_Parameter::INTERPOLATION_SAVE_A:
             {
                 transmit_message = ("SA/\n");
                 break;
             }
-            case ModelParameter::INTERPOLATION_SAVE_B:
+            case Model_Parameter::INTERPOLATION_SAVE_B:
             {
                 transmit_message = ("SB/\n");
                 break;
             }
-            case ModelParameter::INTERPOLATION_RANDOM_A:
+            case Model_Parameter::INTERPOLATION_RANDOM_A:
             {
                 transmit_message = ("RA/\n");
                 break;
             }
-            case ModelParameter::INTERPOLATION_RANDOM_B:
+            case Model_Parameter::INTERPOLATION_RANDOM_B:
             {
                 transmit_message = ("RB/\n");
                 break;
             }
-            case ModelParameter::FREE_RECORDING:
+            case Model_Parameter::FREE_RECORDING:
             {
                 transmit_message = ("FR/\n");
                 break;
             }
-            case ModelParameter::OVERDUB_RECORDING:
+            case Model_Parameter::OVERDUB_RECORDING:
             {
                 transmit_message = ("OR/\n");
                 break;
             }
-            case ModelParameter::RESET_GROOVE:
+            case Model_Parameter::RESET_GROOVE:
             {
                 transmit_message = ("RG/\n");
                 break;

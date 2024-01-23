@@ -134,16 +134,16 @@ struct MidiManager {
         }
     }
 
-    void SendMidiCC(uint8_t channel, uint8_t controllerNumber, uint8_t value) {
+    void SendMidiCC(uint8_t channel, uint8_t cc_number, uint8_t value) {
         // Ensure that the channel is within the valid MIDI channel range (1-16)
         if (channel < 1 || channel > 16) {
             // Handle invalid channel
             return;
         }
 
-        // Ensure that the controllerNumber and value are within valid MIDI ranges (0-127)
-        if (controllerNumber > 127 || value > 127) {
-            // Handle invalid controllerNumber or value
+        // Ensure that the cc_number and value are within valid MIDI ranges (0-127)
+        if (cc_number > 127 || value > 127) {
+            // Handle invalid cc_number or value
             return;
         }
 
@@ -151,7 +151,7 @@ struct MidiManager {
         uint8_t statusByte = 0xB4; // 0xB0 is the status byte for MIDI CC on channel 1
 
         // Construct the MIDI CC message
-        uint8_t data[3] = { statusByte, controllerNumber, value };
+        uint8_t data[3] = { statusByte, cc_number, value };
 
         // Send the MIDI CC message
         uart_midi->SendMessage(data, 3);

@@ -6,7 +6,7 @@ struct PresetPot {
     int adc_channel;
     HardwareManager* hardware_manager;
 
-    PresetPot(enum AdcChannel adc_channel, HardwareManager* hardware_manager) {
+    PresetPot(enum Adc_Channel adc_channel, HardwareManager* hardware_manager) {
         this->adc_channel = adc_channel;
         this->hardware_manager = hardware_manager;
     }
