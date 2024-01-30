@@ -108,7 +108,7 @@ int main(void)
     // loop forever
     while(1) {
         /** Update all cv inputs */
-        if (clock_manager->ticks_from_start_idx % 200000 == 0) {
+        if (clock_manager->ticks_from_start_idx % 20 == 0) {
             ui_components_manager->ReadUIComponents();
         }
 

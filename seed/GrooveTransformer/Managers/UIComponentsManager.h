@@ -1,6 +1,6 @@
-#include "../UIComponents/VoiceDensityPot.h"
-#include "../GlobalHelpers/Enums.h"
 #pragma once
+#include "../UIComponents/Potentiometer.h"
+#include "../GlobalHelpers/Enums.h"
 #include "../UIComponents/VoiceVelocityScalePot.h"
 #include "../UIComponents/InputGrooveVelocityPot.h"
 #include "../UIComponents/InputGrooveOffsetPot.h"
@@ -26,10 +26,10 @@ struct UIComponentsManager {
     ClockManager* clock_manager;
     MidiManager* midi_manager;
 
-    std::array<std::unique_ptr<VoiceDensityPot>, NUM_OUTPUT_VOICES> voice_density_pots;
-    std::array<std::unique_ptr<VoiceVelocityScalePot>, NUM_OUTPUT_VOICES> voice_velocity_scale_pots;
-    std::unique_ptr<InputGrooveVelocityPot> input_groove_velocity_pot;
-    std::unique_ptr<InputGrooveOffsetPot> input_groove_offset_pot;
+    std::array<std::unique_ptr<Potentiometer>, NUM_OUTPUT_VOICES> voice_density_pots;
+    std::array<std::unique_ptr<Potentiometer>, NUM_OUTPUT_VOICES> voice_velocity_scale_pots;
+    std::unique_ptr<Potentiometer> input_groove_velocity_pot;
+    std::unique_ptr<Potentiometer> input_groove_offset_pot;
     std::unique_ptr<TempoPot> tempo_pot;
     std::unique_ptr<InterpolationPot> interpolation_pot;
     std::unique_ptr<ShiftButton> shift_button;
@@ -69,11 +69,13 @@ struct UIComponentsManager {
 
         //** Components */
         for (int i=0; i<NUM_OUTPUT_VOICES; i++) {
-            this->voice_density_pots[i] = std::make_unique<VoiceDensityPot>(i, 0, i, hardware_manager);
-            this->voice_velocity_scale_pots[i] = std::make_unique<VoiceVelocityScalePot>(i, 1, i, hardware_manager, output_buffer_manager);
+            int midi_cc_voice_density = VOICE_DENSITY_SCALE_1 + i;
+            int midi_cc_voice_velocity = VOICE_VELOCITY_SCALE_1 + i;
+            this->voice_density_pots[i] = std::make_unique<Potentiometer>(midi_cc_voice_density, MUX_1, i, hardware_manager, midi_manager);
+            this->voice_velocity_scale_pots[i] = std::make_unique<Potentiometer>(midi_cc_voice_velocity, MUX_2, i, hardware_manager, midi_manager);
         }
-        this->input_groove_velocity_pot = std::make_unique<InputGrooveVelocityPot>(0, INPUT_GROOVE_VEL_POT, hardware_manager);
-        this->input_groove_offset_pot = std::make_unique<InputGrooveOffsetPot>(0, INPUT_GROOVE_OFF_POT, hardware_manager);
+        this->input_groove_velocity_pot = std::make_unique<Potentiometer>(GROOVE_OFFSET, MUX_1, INPUT_GROOVE_OFF_POT, hardware_manager, midi_manager);
+        this->input_groove_offset_pot = std::make_unique<Potentiometer>(GROOVE_VELOCITY, MUX_1, INPUT_GROOVE_VEL_POT, hardware_manager, midi_manager);
         this->tempo_pot = std::make_unique<TempoPot>(1, TEMPO_POT, clock_manager, hardware_manager);
         this->interpolation_pot = std::make_unique<InterpolationPot>(2, INTERPOLATION_POT, this);
         this->shift_button = std::make_unique<ShiftButton>(this->hardware_manager);
@@ -108,7 +110,7 @@ struct UIComponentsManager {
             voice_density_pot->TransmitNewValue(false);
         }
         for (auto&& voice_velocity_scale_pot : this->voice_velocity_scale_pots) {
-            voice_velocity_scale_pot->ReadScaleVoiceVelocityPot();
+            voice_velocity_scale_pot->TransmitNewValue(false);
         }
         this->input_groove_velocity_pot->TransmitNewValue(false);
         this->input_groove_offset_pot->TransmitNewValue(false);
