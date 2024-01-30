@@ -102,3 +102,52 @@ enum class InterpolationButtonName {
     BUTTON_B
 };
 
+
+//******************************************************************************************/
+//** MIDI CC */
+//******************************************************************************************/
+enum MIDI_CC {
+    MIDI_CC_CHANNEL = 3,
+    A_BUTTON_SAVE = 4,
+    B_BUTTON_SAVE = 5,
+    A_BUTTON_RANDOMIZE = 6,
+    B_BUTTON_RANDOMIZE = 7,
+    CROSSFADER_POS = 8,
+    CLEAR = 9,
+    PLAY = 10, 
+    STOP = 11,
+    RECORD = 12,
+    RECORD_OFF = 13,
+    OVERDUB = 14,
+    TEMPO = 15,
+    UNCERTAINTY = 16,
+    GENERAL_PURPOSE_1 = 17,
+    GENERAL_PURPOSE_2 = 18,
+    GENERAL_PURPOSE_3 = 19,
+    GROOVE_VELOCITY = 20,
+    GROOVE_OFFSET = 21,
+    VOICE_VELOCITY_SCALE_1 = 22,
+    VOICE_VELOCITY_SCALE_2 = 23,
+    VOICE_VELOCITY_SCALE_3 = 24,
+    VOICE_VELOCITY_SCALE_4 = 25,
+    VOICE_VELOCITY_SCALE_5 = 26,
+    VOICE_VELOCITY_SCALE_6 = 27,
+    VOICE_DENSITY_SCALE_1 = 28,
+    VOICE_DENSITY_SCALE_2 = 29,
+    VOICE_DENSITY_SCALE_3 = 30,
+    VOICE_DENSITY_SCALE_4 = 31,
+    VOICE_DENSITY_SCALE_5 = 32,
+    VOICE_DENSITY_SCALE_6 = 33,
+    SAVE_1 = 34,
+    SAVE_2 = 35,
+    SAVE_3 = 36,
+    SAVE_4 = 37,
+    SAVE_5 = 38,
+    SAVE_6 = 39,
+    LOAD_1 = 40,
+    LOAD_2 = 41,
+    LOAD_3 = 42,
+    LOAD_4 = 43,
+    LOAD_5 = 44,
+    LOAD_6 = 45,
+};
