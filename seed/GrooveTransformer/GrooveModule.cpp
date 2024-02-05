@@ -17,7 +17,7 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
 	for(size_t i = 0; i < size; i++)
     {
         clock_manager->ObservePlayState();
-        ui_components_manager->PlayReadAndSetState();
+        ui_components_manager->ReadAndSetState();
 
     }
 }
@@ -110,12 +110,8 @@ int main(void)
         /** Update all cv inputs */
         if (clock_manager->ticks_from_start_idx % 20 == 0) {
             ui_components_manager->ReadUIComponents();
+
         }
-
-        ui_components_manager->ObserveSAPMessage();
-        input_buffer_manager->ObserveSAPMessage();
-        input_buffer_manager->ObserveRecordBuffer(); //This must be called before Midi is Handled
         midi_manager->HandleIncomingMidi();
-
     }
 }

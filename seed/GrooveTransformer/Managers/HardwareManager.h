@@ -96,9 +96,9 @@ struct HardwareManager {
     void InitAdc() {
         /** Configure the ADC */
         AdcChannelConfig adc_cfg[NUM_ADC_CHANNELS];
-        adc_cfg[MUX_1].InitMux(seed::A0, 8, seed::D0, seed::D1, seed::D2);
-        adc_cfg[MUX_2].InitMux(seed::A2, 8, seed::D0, seed::D1, seed::D2);
-        adc_cfg[MUX_3].InitMux(seed::A5, 8, seed::D0, seed::D1, seed::D2);
+        adc_cfg[MUX_0].InitMux(seed::A0, 8, seed::D0, seed::D1, seed::D2);
+        adc_cfg[MUX_1].InitMux(seed::A2, 8, seed::D0, seed::D1, seed::D2);
+        adc_cfg[MUX_2].InitMux(seed::A5, 8, seed::D0, seed::D1, seed::D2);
         adc_cfg[GROOVE_TRIGGER_IN].InitSingle(seed::A9);
         adc_cfg[GROOVE_VELOCITY_IN].InitSingle(seed::A10);
         adc_cfg[CLOCK_IN].InitSingle(seed::A4);

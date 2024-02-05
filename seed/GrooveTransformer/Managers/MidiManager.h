@@ -213,5 +213,4 @@ struct MidiManager {
         //     uart_midi->SendMessage(data, 1);
         // }     
     }
-
 };

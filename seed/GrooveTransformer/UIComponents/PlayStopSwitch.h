@@ -2,7 +2,6 @@
 #include "../Managers/HardwareManager.h"
 #include "../Managers/ClockManager.h"
 #include "../Managers/MidiManager.h"
-#include "UIComponentHelper.h"
 
 struct PlayStopSwitch {
     HardwareManager* hardware_manager;
@@ -11,7 +10,7 @@ struct PlayStopSwitch {
     bool play_enabled;
 
 
-    PlayStopSwitch(HardwareManager* hardware_manager, ClockManager* clock_manager, MidiManager* midi_manager) {
+    PlayStopSwitch(HardwareManager* hardware_manager, MidiManager* midi_manager, ClockManager* clock_manager) {
         this->hardware_manager =  hardware_manager;
         this->clock_manager = clock_manager;
         this->midi_manager = midi_manager;

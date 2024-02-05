@@ -3,8 +3,8 @@
 #include "../Managers/MidiManager.h"
 #include "MuxInput.h"
 
-struct Potentiometer : MuxInput {
-    Potentiometer(
+struct CVInput : MuxInput {
+    CVInput(
         int midi_cc, 
         int mux_channel, 
         int mux_idx, 
